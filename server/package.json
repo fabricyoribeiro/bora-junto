@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "src/server.js",
   "scripts": {
-    "servidor": "nodemon src/server.js"
+    "server": " src/server.js"
   },
   "keywords": [],
   "author": "",
