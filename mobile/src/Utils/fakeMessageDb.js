@@ -1,3 +1,4 @@
+//nao esta sendo usada
 export const messageList = [
   {
     id: 1,
@@ -136,7 +137,7 @@ export const messageList = [
     from: "alice@example.com",
     to: "bob@example.com",
     created_at: '2024-06-10 13:15:00',
-    message: "Ainda não, Dave. Você quer vir tomar café comigo?",
+    message: "Ainda não, Dave. Você quer vir tomar café comigo? Ainda não, Dave. Você quer vir tomar café comigo? Ainda não, Dave. Você quer vir tomar café comigo?",
     status: 0 
   }
 ];

@@ -1,18 +1,30 @@
-import { FlatList, KeyboardAvoidingView, TextInput, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { StyleSheet, SectionList } from "react-native";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
 import MessageBubble from "../Components/MessageBubble";
 import MessageSection from "../Components/MessageSection";
-import { messageList } from "../Util/fakeMessageDb";
+import { messageList } from "../Utils/fakeMessageDb";
 import groupBy from "lodash/groupBy";
 import { format } from "date-fns";
 import pt from "date-fns/locale/pt";
+import { api } from "../Lib/axios";
 
 export default function Conversation() {
   const [message, setMessage] = useState("");
+  const [dbMessages, setDbMessages] = useState([]);
   const [listMessages, setListMessages] = useState([]);
+
+  //id do usuario para teste
+  const [userId, setUserId] = useState(1);
+  //id do usuario de destino
+  const [receiverId, setReceiverId] = useState(2);
 
   const navigation = useNavigation();
   useLayoutEffect(() => {
@@ -24,9 +36,45 @@ export default function Conversation() {
     });
   }, []);
 
+  async function fetchMessages() {
+    try {
+      const response = await api.get(`/message/list/${userId}`, {
+        params: {
+          receiver_id: receiverId,
+        },
+      });
+      setDbMessages(response.data);
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function sendMessage() {
+    try {
+      //mensagem teste
+      const response = await api.post(`/message/${userId}`, {
+        sender_id: userId,
+        receiver_id: receiverId,
+        content: message,
+      });
+      setMessage("");
+      fetchMessages();
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() =>  {
+    fetchMessages();
+
+  }, []);
+
   useEffect(() => {
+
     const groupedList = Object.values(
-      groupBy(messageList, function (n) {
+      groupBy(dbMessages, function (n) {
         return n.created_at.substring(0, 10);
       })
     );
@@ -39,82 +87,46 @@ export default function Conversation() {
       data.push(section);
     });
     setListMessages(data);
-    // console.log(groupedList);
-  }, []);
+
+  }, [dbMessages]);
 
   function renderMessage(item) {
-    // console.log(messageList.length);
-
     const sent = () => {
-      return item.username === item.from;
+      return item.sender_id === userId;
     };
 
-    if (item.id === messageList.length) {
-      return (
-        <View>
-          <MessageBubble
-            message={item.message}
-            sent={sent()}
-            dateTime={format(new Date(item.created_at), "HH:mm")}
-            status={item.status}
-          />
-          {/* <View style={{ height: 50 }} /> */}
-        </View>
-      );
-    } else {
-      return (
+    return (
+      <View>
         <MessageBubble
-          message={item.message}
+          message={item.content}
           sent={sent()}
           dateTime={format(new Date(item.created_at), "HH:mm")}
           status={item.status}
         />
-      );
-    }
+      </View>
+    );
   }
-  const sectionListRef = useRef(null);
 
-
-
-  useEffect(() => {
-    // const length = messageList.length
-    if (sectionListRef.current &&  listMessages.length > 0) {
-      sectionListRef.current.scrollToLocation({
-        sectionIndex: listMessages.length -1,
-        itemIndex: listMessages[listMessages.length - 1].data.length - 1,
-        animated: false,
-      });
-    }
-  }, [listMessages]);
 
   return (
     <View style={styles.container}>
-      {/* <SectionList
-        sections={listMessages}
-        keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => renderMessage(item)}
-        showsVerticalScrollIndicator={false}
-        renderSectionHeader={({ section: { title } }) => (
-          <MessageSection date={title} />
-        )}
-      /> */}
       <SectionList
-        ref={sectionListRef}
         sections={listMessages}
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => renderMessage(item)}
         showsVerticalScrollIndicator={false}
-        renderSectionHeader={({ section: { title } }) => (
+        renderSectionFooter={({ section: { title } }) => (
           <MessageSection date={title} />
         )}
-        getItemLayout={(data, index) => ({
-          length: 70,
-          offset: 70 * index,
-          index,
-        }) // Ajuste o tamanho conforme necessário
+        inverted={true}
+        getItemLayout={
+          (data, index) => ({
+            length: 70,
+            offset: 100 * index,
+            index,
+          }) // Ajuste o tamanho conforme necessário
         }
       />
-      
 
       <KeyboardAvoidingView style={styles.inputView}>
         <View style={styles.inputMessage}>
@@ -127,9 +139,9 @@ export default function Conversation() {
             onChangeText={setMessage}
           />
         </View>
-        <View style={styles.sendIcon}>
+        <TouchableOpacity style={styles.sendIcon} onPress={sendMessage}>
           <Feather name="send" size={30} color="black" />
-        </View>
+        </TouchableOpacity>
       </KeyboardAvoidingView>
     </View>
   );
@@ -145,9 +157,8 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   inputView: {
-    
     position: "fixed",
-    
+
     left: 0,
     right: 0,
     bottom: 0,
@@ -155,8 +166,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 15,
     padding: 5,
-    backgroundColor: "#ffffff0",
-    sizing: "border-box"
+    backgroundColor: "#fff",
+    sizing: "border-box",
   },
   inputMessage: {
     backgroundColor: "#EAEAEA",

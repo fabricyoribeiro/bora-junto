@@ -146,7 +146,8 @@ function AppTabs() {
 }
 
 function Routes() {
-  const [user, setUser] = useState(false);
+  //coloquei true para nao precisar ficar fazendo login
+  const [user, setUser] = useState(true);
 
   // Simula o login para fins de teste
   const handleLogin = () => {
