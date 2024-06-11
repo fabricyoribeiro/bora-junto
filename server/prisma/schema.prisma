@@ -14,16 +14,18 @@ datasource db {
 }
 
 model Message {
-  id         Int      @id @default(autoincrement())
-  user_id    Int
-  username   String   @db.VarChar(255)
-  from       String   @db.VarChar(255)
-  to         String   @db.VarChar(255)
-  created_at DateTime @default(now())
-  message    String   @db.VarChar(255)
-  status     Int
+  id          Int      @id @default(autoincrement())
+  sender_id   Int
+  receiver_id Int
+  created_at  DateTime @default(now())
+  content     String   @db.VarChar(255)
+  status      Int
 
-  user User @relation(fields: [user_id], references: [id])
+  sender   User @relation("SentMessages", fields: [sender_id], references: [id])
+  receiver User @relation("ReceivedMessages", fields: [receiver_id], references: [id])
+
+  // @@unique([sender_id, receiver_id])
+  @@map("message")
 }
 
 model UserCategory {
@@ -70,7 +72,8 @@ model User {
   favorite         Favorite[]
   event            Event[]
   goal             Goal[]
-  Message          Message[]
+  sentMessages     Message[]    @relation("SentMessages")
+  receiveMessages  Message[]    @relation("ReceivedMessages")
 
   @@map("user")
 }
