@@ -141,14 +141,14 @@ model Event {
   event_date      DateTime
   created_at      DateTime @default(now())
   user_id         Int
-  location_id     Int
+  location_id     Int?
   privacy_id      Int
-  eventCategoryId Int
+  eventCategoryId Int?
 
   user          User          @relation(fields: [user_id], references: [id])
-  location      Location      @relation(fields: [location_id], references: [id])
+  location      Location?      @relation(fields: [location_id], references: [id])
   privacy       Privacy       @relation(fields: [privacy_id], references: [id])
-  eventCategory EventCategory @relation(fields: [eventCategoryId], references: [id])
+  eventCategory EventCategory? @relation(fields: [eventCategoryId], references: [id])
 
   @@map("event")
 }

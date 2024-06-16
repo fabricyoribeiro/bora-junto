@@ -4,7 +4,7 @@ import { prisma } from "../../lib/prisma.js";
 export default { 
 
     async createEvent(req, res){
-        const { description, event_date, user_id, location_id, privacy_id } = req.body
+        const { description, event_date, user_id, location_id, privacy_id, eventCategoryId} = req.body
         try {
             const event = await prisma.event.create({
                 data: {
@@ -13,6 +13,7 @@ export default {
                     user_id,
                     location_id,
                     privacy_id,
+                    eventCategoryId,
                 }
             })
             res.json(event)
@@ -74,15 +75,49 @@ export default {
 
 
     },
+    async findEventById(req, res) {
+        try {
+            const { id } = req.params
+            const event = await prisma.event.findUnique({ where: { id: Number(id),include:{location:true, privacy: true} }})
+            if (!event) return res.json({ error: "Event does not exist" })
+            return res.json(event)
 
+        } catch (error) {
+            return res.json({ error })
+        }
+    },
+    async findAllEventsByUser(req, res) {
+        try {
+            const { id } = req.params
+            const event = await prisma.event.findFirst({ where: { user_id: Number(id) },include:{location:true, privacy: true}})
+            if (!event) return res.json({ error: "Event does not exist" })
+            return res.json(event)
 
-    
-    async getAllEvents(req, res){
-
+        } catch (error) {
+            return res.json({ error })
+        }
     },
 
-    async getAllEventsById(req, res){
+    async findAllEventsByPrivacy(req, res) {
+        try {
+            const { id } = req.params
+            const event = await prisma.event.findMany({ where: { privacy_id: Number(id),include:{location:true, privacy: true} }})
+            if (!event) return res.json({ error: "Event does not exist" })
+            return res.json(event)
 
+        } catch (error) {
+            return res.json({ error })
+        }
+    },
+    async findAllEvents(req, res) { //erro de segurança, futuramente esse método vai ser alterado, por enquanto é só pra ir testando o mapa
+        try {
+            const event = await prisma.event.findMany({ where: {OR:[{privacy_id:3},{privacy_id:2},{privacy_id:1}]},include:{location:true, privacy: true}})//apenas simulação, no futuro vai ser pego somente public e friends-only
+            if (!event) return res.json({ error: "Event does not exist" })
+            return res.json(event)
+
+        } catch (error) {
+            return res.json({ error })
+        }
     },
 
 }
