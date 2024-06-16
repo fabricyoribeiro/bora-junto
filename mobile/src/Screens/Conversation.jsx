@@ -56,8 +56,6 @@ export default function Conversation() {
         sender_id: userId,
         receiver_id: receiverId,
         content: message,
-        created_at: new Date().toISOString(),
-        status: 0
       }
 
       console.log("nova mensagem criada",newMessage)
