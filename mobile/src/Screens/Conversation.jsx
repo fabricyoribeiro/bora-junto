@@ -15,6 +15,9 @@ import groupBy from "lodash/groupBy";
 import { format } from "date-fns";
 import pt from "date-fns/locale/pt";
 import { api } from "../Lib/axios";
+import { socket } from "../Lib/socket";
+import useSocket from "../Hooks/useSocket";
+
 
 export default function Conversation() {
   const [message, setMessage] = useState("");
@@ -25,6 +28,50 @@ export default function Conversation() {
   const [userId, setUserId] = useState(1);
   //id do usuario de destino
   const [receiverId, setReceiverId] = useState(2);
+  
+  const {socketInstance, isConnected} = useSocket()
+  
+  useEffect(()=> {
+    socketInstance.on("message", (message)=> {
+      console.log('mensagem recebida',message)
+    })
+    socketInstance.on("get_messages", (data)=> {
+      setDbMessages(data)
+    })
+
+    return ()=> {
+      socketInstance.off("message")
+    }
+  }, [])
+
+  
+  //TO DO: ao inves de dar um get_messages a cada mensagem enviada, adicionar a nova mensagem diretamente na dbMessages, 
+  //assim posso atualizar a lista de mensagens sem dar um get_messages, dessa forma a mensagem é salva no banco
+  //mesmo ser dar um get_messages a cada mensagem. para tentar resolver o problema da lentidao
+  //nao deu certo 
+  
+  async function sendMessage() {
+    try {
+      const newMessage = {
+        sender_id: userId,
+        receiver_id: receiverId,
+        content: message,
+      }
+
+      console.log("nova mensagem criada",newMessage)
+      socketInstance.emit('message', newMessage);
+
+      setMessage("");
+
+      socketInstance.emit("get_messages", {userId:userId, receiverId:receiverId})
+
+      
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+
 
   const navigation = useNavigation();
   useLayoutEffect(() => {
@@ -34,6 +81,7 @@ export default function Conversation() {
         tabBarStyle: { display: "none" },
       });
     });
+    console.log('layout')
   }, []);
 
   async function fetchMessages() {
@@ -50,29 +98,15 @@ export default function Conversation() {
     }
   }
 
-  async function sendMessage() {
-    try {
-      //mensagem teste
-      const response = await api.post(`/message/${userId}`, {
-        sender_id: userId,
-        receiver_id: receiverId,
-        content: message,
-      });
-      setMessage("");
-      fetchMessages();
-      console.log(response.data);
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
   useEffect(() =>  {
     fetchMessages();
+    console.log('fetched messages')
+
 
   }, []);
 
   useEffect(() => {
-
     const groupedList = Object.values(
       groupBy(dbMessages, function (n) {
         return n.created_at.substring(0, 10);
