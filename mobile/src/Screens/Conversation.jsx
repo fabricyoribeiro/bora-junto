@@ -73,23 +73,6 @@ export default function Conversation() {
     }
   }
 
-  //antiga função que da um fech toda vez que envia
-  // async function sendMessage() {
-  //   try {
-  //     //mensagem teste
-  //     const response = await api.post(`/message/${userId}`, {
-  //       sender_id: userId,
-  //       receiver_id: receiverId,
-  //       content: message,
-  //     });
-  //     setMessage("");
-  //     fetchMessages();
-  //     console.log(response.data);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
-
 
 
   const navigation = useNavigation();
@@ -120,7 +103,6 @@ export default function Conversation() {
 
   useEffect(() =>  {
     fetchMessages();
-    // socketInstance.emit("get_messages", {userId:userId, receiverId:receiverId})
     console.log('fetched messages')
 
 
