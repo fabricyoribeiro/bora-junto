@@ -89,7 +89,7 @@ export default {
     async findAllEventsByUser(req, res) {
         try {
             const { id } = req.params
-            const event = await prisma.event.findFirst({ where: { user_id: Number(id) },include:{location:true, privacy: true}})
+            const event = await prisma.event.findMany({ where: { user_id: Number(id) },include:{location:true, privacy: true}})
             if (!event) return res.json({ error: "Event does not exist" })
             return res.json(event)
 
