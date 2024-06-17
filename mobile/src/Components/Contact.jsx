@@ -2,9 +2,9 @@ import { FontAwesome } from "@expo/vector-icons";
 import { Image, StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import * as RootNavigation from '../../RootNavigation'
 
-export default function Contact({ name, imageUrl, lastMessage, online }) {
+export default function Contact({ name, imageUrl, lastMessage, online, email, id }) {
   return (
-    <TouchableOpacity style={styles.container} onPress={() => {RootNavigation.navigate("Conversation", {username: name},) }}>
+    <TouchableOpacity style={styles.container} onPress={() => {RootNavigation.navigate("Conversation", {username: name, email:email, receiverId:id},) }}>
       <Image style={styles.image} />
       <View>
         <Text style={styles.title}>

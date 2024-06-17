@@ -10,8 +10,8 @@ export default {
         try {
             const new_message = await prisma.message.create({
                 data: {
-                    sender_id: parseInt(sender_id),
-                    receiver_id: parseInt(receiver_id),
+                    sender_id: sender_id,
+                    receiver_id: receiver_id,
                     content,
                     status: 0,
                 }
@@ -43,7 +43,7 @@ export default {
     // },
     async getAllMessagesByUser(req, res){
         const {id} = req.params
-        const receiver_id = parseInt(req.query.receiver_id, 10);
+        const receiver_id = req.query.receiver_id;
 
         console.log('receiver:',receiver_id)
 
@@ -52,12 +52,12 @@ export default {
                 where: {
                     OR: [
                         {
-                            sender_id: Number(id),
-                            receiver_id: Number(receiver_id)
+                            sender_id: id,
+                            receiver_id: receiver_id
                         },
                         {
-                            sender_id: Number(receiver_id),
-                            receiver_id: Number(id)
+                            sender_id: receiver_id,
+                            receiver_id: id
                         }
                     ]
                 },
@@ -80,12 +80,12 @@ export default {
                 where: {
                     OR: [
                         {
-                            sender_id: Number(userId),
-                            receiver_id: Number(receiverId)
+                            sender_id: userId,
+                            receiver_id: receiverId
                         },
                         {
-                            sender_id: Number(receiverId),
-                            receiver_id: Number(userId)
+                            sender_id: receiverId,
+                            receiver_id: userId
                         }
                     ]
                 },

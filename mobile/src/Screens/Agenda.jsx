@@ -21,7 +21,7 @@ import { api } from "../Lib/axios";
 
 const { width } = Dimensions.get('window');
 
-export default function Agenda() {
+export default function Agenda({onLogout}) {
   const swiper = useRef();
   const [value, setValue] = useState(new Date());
   const [week, setWeek] = useState(0);
@@ -78,7 +78,7 @@ export default function Agenda() {
   return (
 
     <SafeAreaView style={{ flex: 1, backgroundColor: 'white' }}>
-      <Header title='Agenda' />
+      <Header title='Agenda' onLogout={onLogout}/>
       <View style={styles.container}>
         <View style={styles.picker}>
           <Swiper

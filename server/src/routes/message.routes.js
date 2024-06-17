@@ -1,5 +1,5 @@
 
-import Message from "../Modules/Message/index.js";
+import Message from "../modules/Message/index.js";
 import { Router } from "express";
 
 const messageRoutes = Router();

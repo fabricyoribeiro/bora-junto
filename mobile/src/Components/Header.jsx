@@ -4,7 +4,7 @@ import {useState } from "react";
 
 
 
-export default function Header({ navigation, title }) {
+export default function Header({ navigation, title, onLogout }) {
     const [showMenu, setShowMenu] = useState(false)
     const toggleMenu = () =>{
         setShowMenu(!showMenu)
@@ -15,7 +15,7 @@ export default function Header({ navigation, title }) {
         {
             showMenu && 
             
-                <SideMenu showMenu={showMenu} closeMenu={() => {setShowMenu(false)}} />
+                <SideMenu showMenu={showMenu} closeMenu={() => {setShowMenu(false)}} onLogout={onLogout} />
 
         }
             <View style={styles.header}>

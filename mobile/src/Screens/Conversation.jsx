@@ -5,73 +5,73 @@ import {
   View,
 } from "react-native";
 import { StyleSheet, SectionList } from "react-native";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
 import MessageBubble from "../Components/MessageBubble";
 import MessageSection from "../Components/MessageSection";
-import { messageList } from "../Utils/fakeMessageDb";
 import groupBy from "lodash/groupBy";
 import { format } from "date-fns";
 import pt from "date-fns/locale/pt";
 import { api } from "../Lib/axios";
 import { socket } from "../Lib/socket";
 import useSocket from "../Hooks/useSocket";
+import { getUserUID } from "../Services/AuthService";
 
-
-export default function Conversation() {
+export default function Conversation({ route }) {
   const [message, setMessage] = useState("");
   const [dbMessages, setDbMessages] = useState([]);
   const [listMessages, setListMessages] = useState([]);
 
-  //id do usuario para teste
-  const [userId, setUserId] = useState(1);
-  //id do usuario de destino
-  const [receiverId, setReceiverId] = useState(2);
-  
-  const {socketInstance, isConnected} = useSocket()
-  
-  useEffect(()=> {
-    socketInstance.on("message", (message)=> {
-      console.log('mensagem recebida',message)
-    })
-    socketInstance.on("get_messages", (data)=> {
-      setDbMessages(data)
-    })
+  const { receiverId } = route.params;
+  const userId = getUserUID();
+  const { socketInstance, isConnected } = useSocket();
 
-    return ()=> {
-      socketInstance.off("message")
+  useEffect(() => {
+    if (socketInstance) {
+      socketInstance.emit("join_room", userId);
     }
-  }, [])
+  }, [socketInstance, userId]);
 
-  
-  //TO DO: ao inves de dar um get_messages a cada mensagem enviada, adicionar a nova mensagem diretamente na dbMessages, 
-  //assim posso atualizar a lista de mensagens sem dar um get_messages, dessa forma a mensagem é salva no banco
-  //mesmo ser dar um get_messages a cada mensagem. para tentar resolver o problema da lentidao
-  //nao deu certo 
-  
+  useEffect(() => {
+    fetchMessages();
+    console.log("fetched messages");
+  }, []);
+
+  useEffect(() => {
+    if (!socketInstance) return;
+
+    socketInstance.on("get_messages", (data) => {
+      console.log("lista mensagens", data);
+      setDbMessages(data);
+    });
+
+    socketInstance.on("message", (message) => {
+      console.log("mensagem recebida", message);
+      setDbMessages((prevMessages) => [...prevMessages, message]);
+    });
+
+    return () => {
+      socketInstance.off("message");
+      socketInstance.off("get_messages");
+    };
+  }, [socketInstance]);
+
   async function sendMessage() {
     try {
       const newMessage = {
         sender_id: userId,
         receiver_id: receiverId,
         content: message,
-      }
+      };
 
-      console.log("nova mensagem criada",newMessage)
-      socketInstance.emit('message', newMessage);
-
+      console.log("nova mensagem criada", newMessage);
+      socketInstance.emit("message", newMessage);
       setMessage("");
-
-      socketInstance.emit("get_messages", {userId:userId, receiverId:receiverId})
-
-      
     } catch (error) {
       console.log(error);
     }
   }
-
-
 
   const navigation = useNavigation();
   useLayoutEffect(() => {
@@ -81,7 +81,7 @@ export default function Conversation() {
         tabBarStyle: { display: "none" },
       });
     });
-    console.log('layout')
+    console.log("layout");
   }, []);
 
   async function fetchMessages() {
@@ -93,18 +93,11 @@ export default function Conversation() {
       });
       setDbMessages(response.data);
       console.log(response.data);
+
     } catch (error) {
       console.log(error);
     }
   }
-
-
-  useEffect(() =>  {
-    fetchMessages();
-    console.log('fetched messages')
-
-
-  }, []);
 
   useEffect(() => {
     const groupedList = Object.values(
@@ -121,7 +114,6 @@ export default function Conversation() {
       data.push(section);
     });
     setListMessages(data);
-
   }, [dbMessages]);
 
   function renderMessage(item) {
@@ -140,7 +132,6 @@ export default function Conversation() {
       </View>
     );
   }
-
 
   return (
     <View style={styles.container}>
@@ -192,7 +183,6 @@ const styles = StyleSheet.create({
   },
   inputView: {
     position: "fixed",
-
     left: 0,
     right: 0,
     bottom: 0,
@@ -210,9 +200,4 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     flex: 1,
   },
-  sendIcon: {
-    display: "flex",
-    justifyContent: "center",
-    width: "10%",
-  },
-});
+})

@@ -6,7 +6,7 @@ import Contact from "../Components/Contact";
 import { useLayoutEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
 
-export default function Chat() {
+export default function Chat({onLogout}) {
 
   const navigation = useNavigation()
 
@@ -23,21 +23,27 @@ export default function Chat() {
   }, []);
   const fakeData = [
     {
-      username: "joao",
+      id: 'Ikj7ObogpXhvhkbBGK0rAV2m5gB3',
+      username: "joao@gmail.com",
+      email: "joao@gmail.com",
       name: "Joao Lucas",
       imageUrl: "",
       lastMessage: "bora bora",
       online: true,
     },
     {
-      username: "fabricyors",
+      id: 'lLQDixrQV9QuXy9SYPZ3brRA1er2',
+      username: "fabricyo@gmail.com",
+      email: "fabricyo@gmail.com",
       name: "Fabricyo Ribeiro",
       imageUrl: "",
       lastMessage: "bora bora",
       online: false,
     },
     {
-      username: "wender",
+      id: 'jnklWhaarAgR4f0jpCUtExV7BR32',
+      username: "wender@gmail.com",
+      email: "wender@gmail.com",
       name: "Wender Clayton",
       imageUrl: "",
       lastMessage: "bora bora",
@@ -46,7 +52,7 @@ export default function Chat() {
   ];
   return (
     <View>
-      <Header title="Chat" />
+      <Header title="Chat" onLogout={onLogout}/>
       <View style={styles.container}>
         <View style={styles.search}>
           <TextInput placeholder="Search" />
@@ -58,7 +64,7 @@ export default function Chat() {
           keyExtractor={(item) => item.username}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
-            <Contact name={item.name} lastMessage={item.lastMessage} online={item.online}  />
+            <Contact name={item.name} lastMessage={item.lastMessage} online={item.online}  email={item.email} id={item.id}/>
           )}
         />
       </View>

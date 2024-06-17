@@ -1,21 +1,28 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { socket } from "../Lib/socket";
 
-const useSocket = ()=> {
-    const [socketInstance] = useState(socket())
-    const [isConnected, setIsConnected] = useState(socketInstance.connected)
+const useSocket = () => {
+  const socketInstance = useRef(null);
+  const [isConnected, setIsConnected] = useState(false);
 
-    useEffect(()=> {
-        socketInstance.on("connect", ()=> setIsConnected(true))
-        socketInstance.on("disconnect", ()=> setIsConnected(false))
+  useEffect(() => {
+    if (!socketInstance.current) {
+      socketInstance.current = socket();
+    }
 
-        return ()=> {
-            socketInstance.off("connect")
-            socketInstance.off("disconnect")
-        }
-    },[socketInstance])
+    const instance = socketInstance.current;
 
-    return {socketInstance, isConnected}
-}
+    instance.on("connect", () => setIsConnected(true));
+    instance.on("disconnect", () => setIsConnected(false));
+
+    return () => {
+      instance.off("connect");
+      instance.off("disconnect");
+      instance.disconnect();
+    };
+  }, []);
+
+  return { socketInstance: socketInstance.current, isConnected };
+};
 
 export default useSocket;

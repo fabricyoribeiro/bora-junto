@@ -1,8 +1,21 @@
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { FontAwesome, FontAwesome6} from "@expo/vector-icons";
 import * as RootNavigation from "../../RootNavigation";
+import { signOut, getAuth } from "firebase/auth";
 
-export default function SideMenu({ closeMenu }) {
+export default function SideMenu({ closeMenu, onLogout }) {
+
+  const auth = getAuth();
+
+  const logout = () => {
+    signOut(auth).then(()=> {
+      console.log('user signed out')
+      onLogout()
+      // RootNavigation.navigate("Login")
+    }).catch((error)=> {
+      console.log("error signed out",error)
+    })
+  }
 
 
   return (
@@ -49,6 +62,7 @@ export default function SideMenu({ closeMenu }) {
 
         <TouchableOpacity
           style={{ flexDirection: "row", alignItems: "center", gap: 10 }}
+          onPress={logout}
         >
           <View style={{ transform: [{ rotate: "180deg" }] }}>
             <FontAwesome6 name="right-from-bracket" size={15} color="red" />

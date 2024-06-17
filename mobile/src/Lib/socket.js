@@ -1,3 +1,5 @@
 import {io} from 'socket.io-client'
 
-export const socket = () => io('http://192.168.1.108:3030')
+export const socket = () => io('http://192.168.1.108:3030', {
+    reconnection: false
+})

@@ -3,7 +3,7 @@ import { auth } from "./FireBaseConfig";
 
 
 export const getCurrentUser = () => {
-    return auth().currentUser;
+    return auth.currentUser;
 };
 
 export const updateUserProfile = async (displayName, photoURL) => {
@@ -19,4 +19,14 @@ export const updateUserProfile = async (displayName, photoURL) => {
         console.error('Error updating profile:', error.message);
         return false;
     }
+};
+
+export const getUserDisplayName = () => {
+    const user = getCurrentUser();
+    return user ? user.displayName : null;
+};
+
+export const getUserUID = () => {
+    const user = getCurrentUser();
+    return user ? user.uid : null;
 };

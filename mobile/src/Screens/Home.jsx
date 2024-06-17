@@ -20,7 +20,7 @@ import {
 
 
 
-export default function Home({ navigation }) {
+export default function Home({ navigation, onLogout }) {
 
     const [clima, setClima] = useState(null)
     const [progress, setProgress] = useState(8);
@@ -160,7 +160,7 @@ export default function Home({ navigation }) {
 
     return (
         <View style={styles.bg}>
-            <Header title={'Eaí João!'} />
+            <Header title={'Eaí João!'} onLogout={onLogout}/>
 
             <View style={styles.container}>
                 <TouchableOpacity style={styles.block} activeOpacity={0.5} onPress={() => { RootNavigation.navigate("Agenda") }}>

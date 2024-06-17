@@ -4,8 +4,7 @@ import cors from "cors";
 import { Server } from 'socket.io';
 import { createServer } from 'http';
 
-import Message from './Modules/Message/index.js'; // Importe o controller de mensagens
-
+import Message from './modules/Message/index.js'; // Importe o controller de mensagens
 
 const app = express();
 const server = createServer(app);
@@ -36,23 +35,32 @@ server.listen(3030, '0.0.0.0', () => {
     console.log('listening on port 3030');
 });
 
-// setupSocket(io);
-
 io.on("connection", (socket) => {
     console.log('user connected to websocket');
     console.log(socket.id)
-    // Example event handler
+
+    socket.on('join_room', (userId) => {
+        socket.join(userId);
+        console.log(`User with ID: ${userId} joined room: ${userId}`);
+    });
+
     socket.on('message', async ({ sender_id, receiver_id, content }) => {
-        console.log('message received:', sender_id, receiver_id, content );
+        console.log('message received:', sender_id, receiver_id, content);
 
         try {
-            const message = await Message.createMessage(sender_id, receiver_id, content)
-            socket.emit('message', message);
+            const message = await Message.createMessage(sender_id, receiver_id, content);
+
+            // Emitir a mensagem para ambos os usuários
+            io.to(sender_id).emit('message', message);
+            io.to(receiver_id).emit('message', message);
+
+            const messages = await Message.fetchAllMessagesByUser(sender_id, receiver_id);
+            io.to(sender_id).emit('get_messages', messages);
+            io.to(receiver_id).emit('get_messages', messages);
         } catch (error) {
             console.error('Error fetching messages:', error);
             socket.emit('error', { message: 'Error fetching messages' });
         }
-        
     });
 
     socket.on('get_messages', async ({ userId, receiverId }) => {
@@ -64,7 +72,6 @@ io.on("connection", (socket) => {
             socket.emit('error', { message: 'Error fetching messages' });
         }
     });
-
 
     socket.on('disconnect', () => {
         console.log('user disconnected');

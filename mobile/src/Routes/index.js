@@ -15,8 +15,6 @@ import {
 import Chat from "../Screens/Chat.jsx";
 import Conversation from "../Screens/Conversation.jsx";
 
-
-
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
@@ -30,17 +28,13 @@ function AuthStack({ onLogin }) {
   );
 }
 
-function ChatStack() {
-
+function ChatStack({ onLogout }) {
   return (
     <Stack.Navigator>
-      <Stack.Screen
-        name="Chat"
-        component={Chat}
-        options={{ headerShown: false  }}
+      <Stack.Screen name="Chat" options={{ headerShown: false }}>
+        {(props) => <Chat {...props} onLogout={onLogout} />}
+      </Stack.Screen>
 
-        
-      />
       <Stack.Screen
         name="Conversation"
         component={Conversation}
@@ -48,7 +42,9 @@ function ChatStack() {
           headerTitle: () => (
             <View style={styles.profile}>
               <Image style={styles.image} />
-              <Text style={styles.title}>{route.params?.username || 'Username'}</Text>
+              <Text style={styles.title}>
+                {route.params?.username || "Username"}
+              </Text>
             </View>
           ),
         })}
@@ -57,31 +53,21 @@ function ChatStack() {
   );
 }
 
-
-function HomeStack() {
-
+function HomeStack({ onLogout }) {
   return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="Home"
-        component={Home}
-        options={{ headerShown: false  }}
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Home">
+        {(props) => <Home {...props} onLogout={onLogout} />}
+      </Stack.Screen>
 
-        
-      />
-      <Stack.Screen
-        name="Agenda"
-        component={Agenda}
-        options={{ headerShown: false  }}
-        
-      />
+      <Stack.Screen name="Agenda" options={{ headerShown: false }}>
+        {(props) => <Agenda {...props} onLogout={onLogout} />}
+      </Stack.Screen>
     </Stack.Navigator>
   );
 }
 
-
-
-function AppTabs() {
+function AppTabs({ onLogout }) {
   return (
     <Tab.Navigator
       initialRouteName="HomeStack"
@@ -97,10 +83,8 @@ function AppTabs() {
         },
       }}
     >
-      
       <Tab.Screen
         name="ChatStack"
-        component={ChatStack}
         options={{
           tabBarIcon: ({ color, size, focused }) => {
             if (focused) {
@@ -112,10 +96,11 @@ function AppTabs() {
             }
           },
         }}
-      />
+      >
+        {(props) => <ChatStack {...props} onLogout={onLogout} />}
+      </Tab.Screen>
       <Tab.Screen
         name="HomeStack"
-        component={HomeStack}
         options={{
           tabBarIcon: ({ color, size, focused }) => {
             if (focused) {
@@ -125,10 +110,11 @@ function AppTabs() {
             }
           },
         }}
-      />
+      >
+        {(props) => <HomeStack {...props} onLogout={onLogout} />}
+      </Tab.Screen>
       <Tab.Screen
         name="Feed"
-        component={Feed}
         options={{
           tabBarIcon: ({ color, size, focused }) => {
             if (focused) {
@@ -140,21 +126,31 @@ function AppTabs() {
             }
           },
         }}
-      />
+      >
+        {(props) => <Feed {...props} onLogout={onLogout} />}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 }
 
 function Routes() {
   //coloquei true para nao precisar ficar fazendo login
-  const [user, setUser] = useState(true);
+  const [user, setUser] = useState(false);
 
   // Simula o login para fins de teste
   const handleLogin = () => {
-    setUser({ name: "Test User" });
+    setUser(!user);
   };
 
-  return <>{user ? <AppTabs /> : <AuthStack onLogin={handleLogin} />}</>;
+  return (
+    <>
+      {user ? (
+        <AppTabs onLogout={handleLogin} />
+      ) : (
+        <AuthStack onLogin={handleLogin} />
+      )}
+    </>
+  );
 }
 
 export default Routes;

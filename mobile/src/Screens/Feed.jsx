@@ -21,7 +21,7 @@ import {
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import Post from "../Components/Post";
 
-export default function Feed({ navigation }) {
+export default function Feed({ navigation, onLogout }) {
   const [position, setPosition] = useState(null);
   const [cidade, setCidade] = useState("Serra%20Talhada");
   const [clima, setClima] = useState();
@@ -53,7 +53,7 @@ export default function Feed({ navigation }) {
 
   return (
     <View style={styles.bg}>
-      <Header title={'Feed'}/>
+      <Header title={'Feed'} onLogout={onLogout}/>
       <View style={styles.container}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <ScrollView

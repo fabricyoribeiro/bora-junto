@@ -20,7 +20,7 @@ import { auth } from './../Services/FireBaseConfig.js'
 export default function Login({ navigation, onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
+  const [nickName, setNickName] = useState("");
   const [phone, setPhone] = useState("");
   const [userName, setUserName] = useState("");
   const [birthDate, setBirthDate] = useState("");
@@ -49,15 +49,22 @@ export default function Login({ navigation, onLogin }) {
         .then((userCredential) => {
             // Signed in 
             const user = userCredential.user;
-            console.log(user)
+            console.log("USER CRIADO",user)
             createUser({
-              name: name,
-              username: userName,
+              id: user.uid,
+              name: nickName,
+              username: email,
               phone: phone,
               email: email,
-              birth_date: birthDate,
-              user_category_id: 1
+              //TO DO: alterar o input para pegar a data com popup
+              birth_date: new Date(),
+              user_category_id: 1,
+              //foi necessario criar um lacation para poder adicionar o user
+              location_id: 3
+              
             })
+            console.log("USER CADASTRADO COM SUCESSO")
+
         })
         .catch((error) => {
             const errorCode = error.code;
@@ -98,7 +105,7 @@ export default function Login({ navigation, onLogin }) {
               value={email}
               autoCapitalize="none"
               autoComplete="email"
-              onChangeText={(val) => { setEmail(val) }} 
+              onChangeText={setEmail} 
               />
             </View>
             <View style={styles.passwordContainer}>
@@ -114,7 +121,7 @@ export default function Login({ navigation, onLogin }) {
                   style={{ height: 50, flex: 1 }}
                   secureTextEntry={!showPassword}
                   value={password}
-                  onChangeText={(val) => { setPassword(val) }} 
+                  onChangeText={setPassword} 
                 />
                 
                 <TouchableOpacity
@@ -168,21 +175,21 @@ export default function Login({ navigation, onLogin }) {
             <View>
               <Text style={styles.label}>Nome</Text>
               <TextInput style={styles.textInput} 
-              value={name}
-              onChangeText={(val) => { setName(val) }} />
+              value={nickName}
+              onChangeText={setNickName} />
             </View>
             <View>
               <Text style={styles.label}>Telefone</Text>
               <TextInput style={styles.textInput}
               value={phone}
-              onChangeText={(val) => { setPhone(val) }} />
+              onChangeText={setPhone} />
             </View>
             <View>
               <Text style={styles.label}>Usuário | Email</Text>
               
               <TextInput autoCapitalize="none" autoComplete="email" style={styles.textInput}
               value={email}
-              onChangeText={(val) => { setEmail(val) }} />
+              onChangeText={setEmail} />
             </View>
             <View style={styles.passwordContainer}>
               <Text style={styles.label}>Senha</Text>
@@ -197,7 +204,7 @@ export default function Login({ navigation, onLogin }) {
                   style={{ height: 50, flex: 1 }}
                   secureTextEntry={!showPassword}
                   value={password}
-                  onChangeText={(val) => { setPassword(val) }}
+                  onChangeText={setPassword}
                 />
                 <TouchableOpacity
                   onPress={() => setShowPassword(!showPassword)}
@@ -214,7 +221,7 @@ export default function Login({ navigation, onLogin }) {
               <Text style={styles.label}>Data de nascimento</Text>
               <TextInput style={styles.textInput}
               value={birthDate}
-              onChangeText={(val) => { setBirthDate(val) }} />
+              onChangeText={setBirthDate} />
             </View>
             <View style={{ flexDirection: "row", gap: 3, alignItems: "center" }}>
               <Text style={styles.label}>Já possui uma conta?</Text>
