@@ -7,7 +7,8 @@ import {
   View,
   Text,
   TouchableOpacity,
-  TextInput
+  TextInput,
+  ScrollView
 } from 'react-native';
 import moment from 'moment';
 import Swiper from 'react-native-swiper';
@@ -17,7 +18,7 @@ import { Entypo, FontAwesome, FontAwesome6, Ionicons } from '@expo/vector-icons'
 import { format } from "date-fns";
 import pt from "date-fns/locale/pt";
 import { api } from "../Lib/axios";
-
+import EventForm from '../Components/EventForm';
 
 const { width } = Dimensions.get('window');
 
@@ -25,13 +26,21 @@ export default function Agenda({onLogout}) {
   const swiper = useRef();
   const [value, setValue] = useState(new Date());
   const [week, setWeek] = useState(0);
-  const [event, setEvent] = useState()
+  const [events, setEvents] = useState()
 
   const [userId, setUserId] = useState(1)
   const [title, setTitle] = useState()
   const [description, setDescription] = useState()
   const [local, setLocal] = useState()
   const [time, setTime] = useState()
+
+  const [newEventForms, setNewEventForms] = useState([{ id: 1 }]);
+  const addNewEventForm = () => {
+    setNewEventForms([...newEventForms, { id: newEventForms.length + 1 }]);
+}
+const deleteNewEventForm = (id) => {
+  setNewEventForms(newEventForms.filter(newEventForm => newEventForm.id !== id));
+};
 
   const weeks = React.useMemo(() => {
     const start = moment().add(week, 'weeks').startOf('week');
@@ -52,14 +61,7 @@ export default function Agenda({onLogout}) {
     try {
       const response = await api.get(`/event/user/${userId}`);
       const data = response.data
-      setTitle(data.title)
-      setDescription(data.description)
-      setLocal(data.location)
-      const d = new Date(data.event_date);
-      const hours = d.getUTCHours();
-      const minutes = d.getUTCMinutes();
-      const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-      setTime(formattedTime);
+      setEvents(data)
       console.log(data);
     } catch (error) {
       console.log(error);
@@ -141,68 +143,19 @@ export default function Agenda({onLogout}) {
           </Swiper>
         </View>
 
-
         <Text style={styles.subtitle}>{format(new Date(value), "PPP", { locale: pt })}</Text>
+        <ScrollView style={{ flex: 1, flexDirection: 'column', marginBottom: 100}}>
+          {Array.isArray(events) ?(
+            events.map((event, index) => (
+              <EventForm event={event}/>
+            ))
+          ): (
+            <EventForm/>
+          )
+          
+          }
 
-        <View style={styles.block}>
-          <View>
-            <Text style={styles.label}>Atividade</Text>
-            <View style={styles.inputBox}>
-              <TextInput
-                style={styles.textInput}
-                value={title}
-                onChangeText={(val) => setTitle(val)}
-              />
-              <FontAwesome name='user' size={15} style={styles.inputIcon} />
-            </View>
-          </View>
-          <View>
-            <Text style={styles.label}>Descrição</Text>
-            <View style={styles.inputBox}>
-              <TextInput style={{
-                borderBottomWidth: 0.5,
-                borderBottomColor: "gray",
-                width: '100%',
-                maxHeight: 180,
-                paddingRight: 20
-              }}
-                value={description}
-                onChangeText={(val) => setDescription(val)}
-                multiline textAlignVertical='top' />
-              <FontAwesome name='list' size={15} style={styles.inputIcon} />
-            </View>
-          </View>
-          <View>
-            <Text style={styles.label}>Local</Text>
-            <View style={styles.inputBox}>
-              <TextInput
-                style={styles.textInput}
-                value={local}
-                onChangeText={(val) => setDescription(val)}
-              />
-              <Entypo name='location-pin' size={20} style={styles.inputIcon} />
-            </View>
-          </View>
-          <View>
-            <Text style={styles.label}>Horário</Text>
-            <View style={styles.inputBox}>
-              <TextInput
-                style={styles.textInput}
-                value={time}
-                onChangeText={(val) => setTime(val)}
-              />
-              <FontAwesome6 name='clock' size={15} style={styles.inputIcon} />
-            </View>
-          </View>
-          <View style={{ flexDirection: 'row', gap: 20 }}>
-            <ButtonAction icon={'trash'} action={deleteEvent} />
-            <ButtonAction icon={'plus'} />
-            <ButtonAction text={'Salvar'} />
-
-          </View>
-
-
-        </View>
+        </ScrollView>
       </View>
 
     </SafeAreaView>
