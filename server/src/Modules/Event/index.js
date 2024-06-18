@@ -4,10 +4,11 @@ import { prisma } from "../../lib/prisma.js";
 export default { 
 
     async createEvent(req, res){
-        const { description, event_date, user_id, location_id, privacy_id, eventCategoryId} = req.body
+        const { title, description, event_date, user_id, location_id, privacy_id, eventCategoryId} = req.body
         try {
             const event = await prisma.event.create({
                 data: {
+                    title,
                     description,
                     event_date,
                     user_id,
@@ -26,7 +27,7 @@ export default {
     async deleteEvent(req, res){
         const {id} = req.params
         const event_id= parseInt(id)
-        const event_exists = await prisma.event.findFirst({id: event_id})
+        const event_exists = await prisma.event.findUnique({where:{id: event_id}})
         if(!event_exists) {
             res.status(500).json({erro: 'Event not found'})
         }
@@ -46,10 +47,10 @@ export default {
     },
     async updateEvent(req, res){
         const {id} = req.params
-        const {description, event_date, location_id, privacy_id} = req.body
+        const {title, description, event_date, location_id, privacy_id} = req.body
         const event_id = parseInt(id)
 
-        const event_exists = await prisma.event.findFirst({id: event_id})
+        const event_exists = await prisma.event.findUnique({where:{id: event_id}})
         if(!event_exists) {
             res.status(500).json({erro: 'Event not found'})
         }
@@ -61,6 +62,7 @@ export default {
 
                 },
                 data: {
+                    title,
                     description,
                     event_date,
                     location_id,

@@ -13,7 +13,7 @@ import { api } from "../Lib/axios";
 
 const { width } = Dimensions.get('window');
 
-export default function EventForm({ event }) {
+export default function EventForm({ event, addNewForm}) {
 
     const [userId, setUserId] = useState(1)
     const [title, setTitle] = useState()
@@ -36,10 +36,41 @@ export default function EventForm({ event }) {
 
     },[event])
 
+    async function handleEvent(){
+        if (event) {
+            try {
+                const updatedEvent = {
+                    title: title,
+                    description: description,
+                    localtion: local,
+                    event_date: `1970-01-01T${time}:00Z`
+                }
+                const response = await api.put(`/event/${event.id}`,updatedEvent);
+                const data = response.data
+                console.log(data);
+            } catch (error) {
+                console.log(error);
+            }
+        }else {
+            try {
+                const newEvent = {
+                    title: title,
+                    description: description,
+                    location: local,
+                    event_date: `1970-01-01T${time}:00Z`
+                }
+                const response = await api.post(`/event`,newEvent);
+                const data = response.data
+                console.log(data);
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    }
 
-    async function deleteEvent(id) {
+    async function deleteEvent() {
         try {
-            const response = await api.delete(`/event/${id}`);
+            const response = await api.delete(`/event/${event.id}`);
             const data = response.data
             console.log(data);
         } catch (error) {
@@ -56,7 +87,7 @@ export default function EventForm({ event }) {
                     <TextInput
                         style={styles.textInput}
                         value={title}
-                        onChangeText={(val) => setTitle(val)}
+                        onChangeText={setTitle}
                     />
                     <FontAwesome name='user' size={15} style={styles.inputIcon} />
                 </View>
@@ -72,7 +103,7 @@ export default function EventForm({ event }) {
                         paddingRight: 20
                     }}
                         value={description}
-                        onChangeText={(val) => setDescription(val)}
+                        onChangeText={setDescription}
                         multiline textAlignVertical='top' />
                     <FontAwesome name='list' size={15} style={styles.inputIcon} />
                 </View>
@@ -83,7 +114,7 @@ export default function EventForm({ event }) {
                     <TextInput
                         style={styles.textInput}
                         value={local}
-                        onChangeText={(val) => setDescription(val)}
+                        onChangeText={setLocal}
                     />
                     <Entypo name='location-pin' size={20} style={styles.inputIcon} />
                 </View>
@@ -94,15 +125,15 @@ export default function EventForm({ event }) {
                     <TextInput
                         style={styles.textInput}
                         value={time}
-                        onChangeText={(val) => setTime(val)}
+                        onChangeText={setTime}
                     />
                     <FontAwesome6 name='clock' size={15} style={styles.inputIcon} />
                 </View>
             </View>
             <View style={{ flexDirection: 'row', gap: 20 }}>
                 <ButtonAction icon={'trash'} action={deleteEvent} />
-                <ButtonAction icon={'plus'} />
-                <ButtonAction text={'Salvar'} />
+                <ButtonAction icon={'plus'} action={addNewForm}/>
+                <ButtonAction text={'Salvar'} action={handleEvent}/>
 
             </View>
 

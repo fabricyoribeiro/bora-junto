@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   StyleSheet,
   Dimensions,
@@ -56,6 +56,8 @@ const deleteNewEventForm = (id) => {
       });
     });
   }, [week]);
+
+
 
   async function fetchEvents() {
     try {
@@ -147,14 +149,20 @@ const deleteNewEventForm = (id) => {
         <ScrollView style={{ flex: 1, flexDirection: 'column', marginBottom: 100}}>
           {Array.isArray(events) ?(
             events.map((event, index) => (
-              <EventForm event={event}/>
+              <EventForm event={event} addNewForm={addNewEventForm}/>
             ))
           ): (
-            <EventForm/>
+            <EventForm addNewForm={addNewEventForm}/>
           )
           
           }
-
+          {
+            Array.isArray(newEventForms) ?(
+              newEventForms.map((e, index) => (
+                <EventForm addNewForm={addNewEventForm}/>
+              ))
+            ): null
+          }
         </ScrollView>
       </View>
 
