@@ -9,6 +9,7 @@ eventRoutes.get("/list", event.findAllEvents)
 eventRoutes.get("/privacy/:id", event.findAllEventsByPrivacy)
 eventRoutes.get("/user/:id", event.findAllEventsByUser)
 eventRoutes.get("/:id", event.findEventById)
+eventRoutes.get("/date/:date", event.findAllEventsByDate)
 eventRoutes.put("/:id", event.updateEvent)
 eventRoutes.delete("/:id", event.deleteEvent)
 

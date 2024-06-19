@@ -27,7 +27,7 @@ export default {
     async deleteEvent(req, res){
         const {id} = req.params
         const event_id= parseInt(id)
-        const event_exists = await prisma.event.findUnique({where:{id: event_id}})
+        const event_exists = await prisma.event.delete({where:{id: event_id}})
         if(!event_exists) {
             res.status(500).json({erro: 'Event not found'})
         }
@@ -114,6 +114,21 @@ export default {
     async findAllEvents(req, res) { //erro de segurança, futuramente esse método vai ser alterado, por enquanto é só pra ir testando o mapa
         try {
             const event = await prisma.event.findMany({ where: {OR:[{privacy_id:3},{privacy_id:2},{privacy_id:1}]},include:{location:true, privacy: true}})//apenas simulação, no futuro vai ser pego somente public e friends-only
+            if (!event) return res.json({ error: "Event does not exist" })
+            return res.json(event)
+
+        } catch (error) {
+            return res.json({ error })
+        }
+    },
+    async findAllEventsByDate(req, res) {
+        const { date } = req.params.date
+        const dateObj = new Date(date);
+        const startOfDay = new Date(dateObj.setUTCHours(0, 0, 0, 0));
+        const endOfDay = new Date(dateObj.setUTCHours(23, 59, 59, 999));
+
+        try {
+            const event = await prisma.event.findMany({ where: {created_at:{gte:startOfDay, lte: endOfDay}}})
             if (!event) return res.json({ error: "Event does not exist" })
             return res.json(event)
 

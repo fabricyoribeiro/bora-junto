@@ -149,10 +149,10 @@ const deleteNewEventForm = (id) => {
         <ScrollView style={{ flex: 1, flexDirection: 'column', marginBottom: 100}}>
           {Array.isArray(events) ?(
             events.map((event, index) => (
-              <EventForm event={event} addNewForm={addNewEventForm}/>
+              <EventForm event={event} addNewForm={addNewEventForm} delete={deleteEvent(event.id)}/>
             ))
           ): (
-            <EventForm addNewForm={addNewEventForm}/>
+            <EventForm addNewForm={addNewEventForm} delete={deleteNewEventForm(1)}/>
           )
           
           }
