@@ -1,5 +1,5 @@
 
-import Goal from "../Modules/Goal/index.js";
+import Goal from "../modules/Goal/index.js";
 import { Router } from "express";
 
 const goalRoutes = Router();

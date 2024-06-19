@@ -1,4 +1,4 @@
-import post from "../Modules/Post/index.js";
+import post from "../modules/Post/index.js";
 import { Router } from "express";
 
 const postRoutes = Router()
