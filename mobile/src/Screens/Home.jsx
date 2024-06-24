@@ -188,7 +188,7 @@ export default function Home({ navigation, onLogout }) {
                         <Text style={styles.title}>Corrida</Text>
                     </View>
                     <Ionicons name="calendar" size={20} color="black" style={{ bottom: 20, right: 20, position: 'absolute' }} />
-                </TouchableOpacity>
+                </TouchableOpacity >
                 {
                     clima && position ? (
                         <>
@@ -219,7 +219,7 @@ export default function Home({ navigation, onLogout }) {
                 }
                 {
                     position &&
-                    <View style={styles.mapblock}>
+                    <TouchableOpacity style={styles.mapblock} activeOpacity={0.9} onPress={()=>navigation.navigate('Map') }>
                         <MapView
                             ref={mapRef}
                             style={styles.map}
@@ -240,7 +240,7 @@ export default function Home({ navigation, onLogout }) {
 
                             </Marker>
                         </MapView>
-                    </View>
+                    </TouchableOpacity>
 
                 }
             </View>
@@ -280,15 +280,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 15,
         gap: 15
     },
-    block: {
-        backgroundColor: '#EAEAEA',
-        width: '100%',
-        padding: 20,
-        borderRadius: 24,
-        flexDirection: 'row',
-        gap: 15,
 
-    },
     block: {
         backgroundColor: '#EAEAEA',
         width: '100%',
@@ -305,8 +297,6 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         gap: 15,
         overflow: 'hidden',
-
-
     },
     blockhalf: {
         backgroundColor: '#EAEAEA',
@@ -333,7 +323,8 @@ const styles = StyleSheet.create({
         bottom: -30,
         lef: 0,
         right: 0,
-        width: '100%'
+        width: '100%',
+        
     }
 },
 

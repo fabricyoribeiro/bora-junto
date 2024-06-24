@@ -200,4 +200,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     flex: 1,
   },
+  sendIcon:{
+    alignSelf: 'center'
+  }
 })

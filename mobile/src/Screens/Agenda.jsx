@@ -16,6 +16,8 @@ import { api } from "../Lib/axios";
 import EventForm from "../Components/EventForm";
 import Header from "../Components/Header";
 import { getUserUID } from "../Services/AuthService";
+import Loading from "../Components/Loading.jsx";
+
 
 const { width } = Dimensions.get("window");
 
@@ -25,6 +27,7 @@ export default function Agenda({ onLogout }) {
   const [week, setWeek] = useState(0);
   const [events, setEvents] = useState([]);
   const [newEventForms, setNewEventForms] = useState([{ id: 1 }]);
+  const [loading, setLoading] = useState(false)
 
   // user que ta logado
   const userId = getUserUID();
@@ -73,6 +76,7 @@ export default function Agenda({ onLogout }) {
 
   // esse fetch pega por dia e usuario
   async function fetchEvents(date) {
+    setLoading(true)
     try {
       console.log("fetch", date);
       console.log(moment(date).format("YYYY-MM-DD"));
@@ -87,6 +91,7 @@ export default function Agenda({ onLogout }) {
     } catch (error) {
       console.log(error);
     }
+    setLoading(false)
   }
 
   async function deleteEvent(id) {
@@ -176,14 +181,15 @@ export default function Agenda({ onLogout }) {
         </Text>
         <ScrollView
           style={{ flex: 1, flexDirection: "column", marginBottom: 100 }}
-        >
+          >
+          <Loading visible={loading}/>
           {Array.isArray(events) &&
             events.map((event, index) => (
               <EventForm
-                key={event.id}
-                event={event}
-                addNewForm={addNewEventForm}
-                delete={() => deleteEvent(event.id)}
+              key={event.id}
+              event={event}
+              addNewForm={addNewEventForm}
+              delete={() => deleteEvent(event.id)}
               />
             ))}
           {Array.isArray(newEventForms) &&

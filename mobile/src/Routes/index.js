@@ -14,6 +14,7 @@ import {
 } from "@expo/vector-icons";
 import Chat from "../Screens/Chat.jsx";
 import Conversation from "../Screens/Conversation.jsx";
+import Map from "../Screens/Map.jsx";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -63,6 +64,9 @@ function HomeStack({ onLogout }) {
       <Stack.Screen name="Agenda" options={{ headerShown: false }}>
         {(props) => <Agenda {...props} onLogout={onLogout} />}
       </Stack.Screen>
+      <Stack.Screen name="Map" options={{ headerShown: false }}>
+        {(props) => <Map {...props} onLogout={onLogout} />}
+      </Stack.Screen>
     </Stack.Navigator>
   );
 }
@@ -80,6 +84,8 @@ function AppTabs({ onLogout }) {
           backgroundColor: "#f00",
           borderTopWidth: 0,
           borderTopLeftRadius: 61,
+          elevation: 0, // for Android
+          shadowOpacity: 0
         },
       }}
     >

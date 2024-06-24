@@ -47,7 +47,6 @@ const styles = StyleSheet.create({
         width: '100%',
         alignItems: 'center',
         gap: 10,
-        backgroundColor: 'white',
         zIndex: 2
 
     },

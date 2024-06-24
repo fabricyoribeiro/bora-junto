@@ -13,5 +13,7 @@ eventRoutes.get("/date/:date", event.findAllEventsByDate)
 eventRoutes.put("/:id", event.updateEvent)
 eventRoutes.delete("/:id", event.deleteEvent)
 
+eventRoutes.get("/category/list", event.findAllCategories)
+
 
 export {eventRoutes}

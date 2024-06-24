@@ -16,6 +16,8 @@ import { api } from "../Lib/axios";
 import { getUserUID } from "../Services/AuthService";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import { format } from "date-fns";
+import { Dropdown } from 'react-native-element-dropdown';
+
 
 export default function EventForm({ event, addNewForm, eventDate, fetchEvents }) {
   const [title, setTitle] = useState('');
@@ -23,10 +25,37 @@ export default function EventForm({ event, addNewForm, eventDate, fetchEvents })
   const [local, setLocal] = useState('');
   const [time, setTime] = useState("");
   const [date, setDate] = useState(new Date());
+  const [categoryId, setCategoryId] = useState(1)
   //controlar o modal de hora
   const [open, setOpen] = useState(false);
   // id do user logado
   const userId = getUserUID();
+
+  //categorias dropdown
+  const [isFocus, setIsFocus] = useState(false)
+  const [categories, setCategories] = useState([])
+
+  async function fetchCategories(date) {
+    try {
+      const response = await api.get(`/event/category/list`);
+      const data = response.data;
+      setCategories(data);
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const data = [
+    { label: 'Item 1', value: '1' },
+    { label: 'Item 2', value: '2' },
+    { label: 'Item 3', value: '3' },
+    { label: 'Item 4', value: '4' },
+    { label: 'Item 5', value: '5' },
+    { label: 'Item 6', value: '6' },
+    { label: 'Item 7', value: '7' },
+    { label: 'Item 8', value: '8' },
+  ];
 
   const handleConfirm = (date) => {
     //o input de data pega 3 horas à frente, precisa ajustar
@@ -39,6 +68,7 @@ export default function EventForm({ event, addNewForm, eventDate, fetchEvents })
   };
 
   useEffect(() => {
+    fetchCategories()
     if (event) {
       setTitle(event.title);
       setDescription(event.description);
@@ -53,7 +83,7 @@ export default function EventForm({ event, addNewForm, eventDate, fetchEvents })
     }
   }, [event]);
 
-  function cleanFields(){
+  function cleanFields() {
     setTitle('')
     setDescription('')
     setLocal('')
@@ -104,7 +134,7 @@ export default function EventForm({ event, addNewForm, eventDate, fetchEvents })
     try {
       const response = await api.delete(`/event/${event.id}`);
       const data = response.data;
-      console.log("deletado: ",data);
+      console.log("deletado: ", data);
     } catch (error) {
       console.log(error);
     }
@@ -142,6 +172,29 @@ export default function EventForm({ event, addNewForm, eventDate, fetchEvents })
           <FontAwesome name="list" size={15} style={styles.inputIcon} />
         </View>
       </View>
+
+      <Text style={styles.label}>Categoria</Text>
+      <Dropdown
+        
+        style={[styles.dropdown, isFocus]}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        iconStyle={styles.iconStyle}
+        data={categories.map(item => ({ label: item.title, value: item.id }))}
+        search
+        maxHeight={200}
+        labelField="label"
+        valueField="value"
+        placeholder={!isFocus ? '' : '...'}
+        searchPlaceholder="Buscar..."
+        value={categoryId}
+        onFocus={() => setIsFocus(true)}
+        onBlur={() => setIsFocus(false)}
+        onChange={categoryIdNew => {
+          setCategoryId(categoryIdNew.value);
+        }}
+      />
       <View>
         <Text style={styles.label}>Local</Text>
         <View style={styles.inputBox}>
@@ -226,4 +279,37 @@ const styles = StyleSheet.create({
     position: "absolute",
     alignSelf: "flex-end",
   },
+  dropdown: {
+
+    borderBottomWidth: 0.5,
+    borderBottomColor: "gray",
+    borderRadius: 8,
+    width:'100%',
+    color: 'black',
+},
+
+
+placeholderStyle: {
+    fontSize: 14,
+    color: 'gray'
+},
+selectedTextStyle: {
+    fontSize: 14,
+},
+iconStyle: {
+    width: 20,
+    height: 20,
+},
+inputSearchStyle: {
+    height: 40,
+    fontSize: 14,
+},
+dropdownContainer: {
+    flex: 1,
+    backgroundColor: '#533483',
+    padding: 16,
+    justifyContent: 'center',
+    alignContent: 'center',
+},
+
 });

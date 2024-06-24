@@ -178,4 +178,13 @@ export default {
       return res.status(500).json({ error: "Internal server error" });
     }
   },
+  async findAllCategories(req, res) {
+    try {
+      const categories = await prisma.eventCategory.findMany();
+      if (!categories) return res.json({ error: "No categories" });
+      return res.json(categories);
+    } catch (error) {
+      return res.json({ error });
+    }
+  },
 };
