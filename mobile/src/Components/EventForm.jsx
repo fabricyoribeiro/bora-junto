@@ -46,17 +46,6 @@ export default function EventForm({ event, addNewForm, eventDate, fetchEvents })
     }
   }
 
-  const data = [
-    { label: 'Item 1', value: '1' },
-    { label: 'Item 2', value: '2' },
-    { label: 'Item 3', value: '3' },
-    { label: 'Item 4', value: '4' },
-    { label: 'Item 5', value: '5' },
-    { label: 'Item 6', value: '6' },
-    { label: 'Item 7', value: '7' },
-    { label: 'Item 8', value: '8' },
-  ];
-
   const handleConfirm = (date) => {
     //o input de data pega 3 horas à frente, precisa ajustar
     const adjustmentDate = new Date(
@@ -107,6 +96,7 @@ export default function EventForm({ event, addNewForm, eventDate, fetchEvents })
       location_id: 2,
       local: local,
       event_date: newEventDate,
+      event_category: categoryId
     };
     //update nao funcionou
     if (event) {
