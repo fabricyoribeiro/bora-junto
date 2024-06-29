@@ -59,7 +59,7 @@ model User {
   profile_pic_url  String?
   phone            String   @unique
   email            String   @unique
-  birth_date       DateTime
+  birth_date       DateTime?
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
   location_id      Int

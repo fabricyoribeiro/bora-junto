@@ -11,7 +11,6 @@ export default {
       profile_pic_url,
       phone,
       email,
-      birth_date,
       location_id,
     } = req.body;
     console.log(
@@ -22,7 +21,6 @@ export default {
       profile_pic_url,
       phone,
       email,
-      birth_date
     );
     console.log("usuario", username);
 
@@ -37,7 +35,6 @@ export default {
           user_category_id: parseInt(user_category_id),
           profile_pic_url,
           location_id,
-          birth_date,
         },
       });
 

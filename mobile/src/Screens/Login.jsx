@@ -22,13 +22,12 @@ export default function Login({ navigation, onLogin }) {
   const [password, setPassword] = useState("");
   const [nickName, setNickName] = useState("");
   const [phone, setPhone] = useState("");
-  const [userName, setUserName] = useState("");
-  const [birthDate, setBirthDate] = useState("");
+  const [username, setUsername] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loginVisible, setLoginVisible] = useState(true);
 
   const createUser = (userData) => {
-    fetch(`http://192.168.1.108:3030/user`, {
+    fetch(`http://192.168.1.109:3030/user`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData)
@@ -53,11 +52,10 @@ export default function Login({ navigation, onLogin }) {
             createUser({
               id: user.uid,
               name: nickName,
-              username: email,
+              username: username,
               phone: phone,
               email: email,
               //TO DO: alterar o input para pegar a data com popup
-              birth_date: new Date(),
               user_category_id: 1,
               //foi necessario criar um lacation para poder adicionar o user
               location_id: 3
@@ -179,17 +177,25 @@ export default function Login({ navigation, onLogin }) {
               onChangeText={setNickName} />
             </View>
             <View>
-              <Text style={styles.label}>Telefone</Text>
-              <TextInput style={styles.textInput}
-              value={phone}
-              onChangeText={setPhone} />
+              <Text style={styles.label}>Usuario</Text>
+              
+              <TextInput autoCapitalize="none" autoComplete="email" style={styles.textInput}
+              value={username}
+              onChangeText={setUsername} />
             </View>
             <View>
-              <Text style={styles.label}>Usuário | Email</Text>
+              <Text style={styles.label}>Email</Text>
               
               <TextInput autoCapitalize="none" autoComplete="email" style={styles.textInput}
               value={email}
               onChangeText={setEmail} />
+            </View>
+            <View>
+              <Text style={styles.label}>Telefone</Text>
+              
+              <TextInput autoCapitalize="none" autoComplete="email" style={styles.textInput}
+              value={phone}
+              onChangeText={setPhone} />
             </View>
             <View style={styles.passwordContainer}>
               <Text style={styles.label}>Senha</Text>
@@ -217,12 +223,7 @@ export default function Login({ navigation, onLogin }) {
                 </TouchableOpacity>
               </View>
             </View>
-            <View>
-              <Text style={styles.label}>Data de nascimento</Text>
-              <TextInput style={styles.textInput}
-              value={birthDate}
-              onChangeText={setBirthDate} />
-            </View>
+
             <View style={{ flexDirection: "row", gap: 3, alignItems: "center" }}>
               <Text style={styles.label}>Já possui uma conta?</Text>
               <TouchableOpacity onPress={() => setLoginVisible(!loginVisible)}>

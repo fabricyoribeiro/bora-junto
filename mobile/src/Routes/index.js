@@ -141,7 +141,7 @@ function AppTabs({ onLogout }) {
 
 function Routes() {
   //coloquei true para nao precisar ficar fazendo login
-  const [user, setUser] = useState(true);
+  const [user, setUser] = useState(false);
 
   // Simula o login para fins de teste
   const handleLogin = () => {
