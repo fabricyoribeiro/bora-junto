@@ -28,6 +28,7 @@ export default function EventForm({
   const [time, setTime] = useState("");
   const [date, setDate] = useState(new Date());
   const [categoryId, setCategoryId] = useState(1)
+  const [privacyId, setPrivacyId] = useState(1)
   //controlar o modal de hora
   const [open, setOpen] = useState(false);
   // id do user logado
@@ -64,6 +65,8 @@ export default function EventForm({
       setTitle(event.title);
       setDescription(event.description);
       setLocal(event.location);
+      setPrivacyId(event.privacy_id)
+      setCategoryId(event.category_id)
       const d = new Date(event.event_date);
       const hours = d.getUTCHours();
       const minutes = d.getUTCMinutes();
