@@ -7,33 +7,37 @@ import {
   TouchableOpacity,
 } from "react-native";
 import ButtonAction from "../Components/ButtonAction";
-import {
-  Entypo,
-  FontAwesome,
-  FontAwesome6,
-} from "@expo/vector-icons";
+import { Entypo, FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import { api } from "../Lib/axios";
 import { getUserUID } from "../Services/AuthService";
 import DateTimePicker from "react-native-modal-datetime-picker";
 import { format } from "date-fns";
-import { Dropdown } from 'react-native-element-dropdown';
+import { Dropdown } from "react-native-element-dropdown";
+import Checkbox from "expo-checkbox";
+import { RadioButton } from "react-native-paper";
 
-
-export default function EventForm({ event, addNewForm, eventDate, fetchEvents }) {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [local, setLocal] = useState('');
+export default function EventForm({
+  event,
+  addNewForm,
+  eventDate,
+  fetchEvents,
+}) {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [local, setLocal] = useState("");
   const [time, setTime] = useState("");
   const [date, setDate] = useState(new Date());
-  const [categoryId, setCategoryId] = useState(1)
+  const [categoryId, setCategoryId] = useState(1);
+  const [privacyId, setPrivacyId] = useState(3);
+
   //controlar o modal de hora
   const [open, setOpen] = useState(false);
   // id do user logado
   const userId = getUserUID();
 
   //categorias dropdown
-  const [isFocus, setIsFocus] = useState(false)
-  const [categories, setCategories] = useState([])
+  const [isFocus, setIsFocus] = useState(false);
+  const [categories, setCategories] = useState([]);
 
   async function fetchCategories(date) {
     try {
@@ -57,11 +61,13 @@ export default function EventForm({ event, addNewForm, eventDate, fetchEvents })
   };
 
   useEffect(() => {
-    fetchCategories()
+    fetchCategories();
     if (event) {
       setTitle(event.title);
       setDescription(event.description);
       setLocal(event.location);
+      setPrivacyId(event.privacy_id);
+      setCategoryId(event.category_id)
       const d = new Date(event.event_date);
       const hours = d.getUTCHours();
       const minutes = d.getUTCMinutes();
@@ -73,12 +79,12 @@ export default function EventForm({ event, addNewForm, eventDate, fetchEvents })
   }, [event]);
 
   function cleanFields() {
-    setTitle('')
-    setDescription('')
-    setLocal('')
-    setTime('')
-    setDate(new Date())
-    fetchEvents(eventDate)
+    setTitle("");
+    setDescription("");
+    setLocal("");
+    setTime("");
+    setDate(new Date());
+    fetchEvents(eventDate);
   }
 
   async function handleEvent() {
@@ -96,7 +102,9 @@ export default function EventForm({ event, addNewForm, eventDate, fetchEvents })
       location_id: 2,
       local: local,
       event_date: newEventDate,
-      event_category: categoryId
+      event_category: categoryId,
+
+      privacy_id: privacyId,
     };
     //update nao funcionou
     if (event) {
@@ -117,7 +125,7 @@ export default function EventForm({ event, addNewForm, eventDate, fetchEvents })
         console.log(error);
       }
     }
-    cleanFields()
+    cleanFields();
   }
 
   async function deleteEvent() {
@@ -140,7 +148,7 @@ export default function EventForm({ event, addNewForm, eventDate, fetchEvents })
             value={title}
             onChangeText={setTitle}
           />
-          <FontAwesome name="user" size={15} style={styles.inputIcon} />
+          <FontAwesome name="user" size={18} style={styles.inputIcon} />
         </View>
       </View>
       <View>
@@ -159,29 +167,28 @@ export default function EventForm({ event, addNewForm, eventDate, fetchEvents })
             multiline
             textAlignVertical="top"
           />
-          <FontAwesome name="list" size={15} style={styles.inputIcon} />
+          <FontAwesome name="list" size={18} style={styles.inputIcon} />
         </View>
       </View>
 
       <Text style={styles.label}>Categoria</Text>
       <Dropdown
-        
         style={[styles.dropdown, isFocus]}
         placeholderStyle={styles.placeholderStyle}
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
-        data={categories.map(item => ({ label: item.title, value: item.id }))}
+        data={categories.map((item) => ({ label: item.title, value: item.id }))}
         search
         maxHeight={200}
         labelField="label"
         valueField="value"
-        placeholder={!isFocus ? '' : '...'}
+        placeholder={!isFocus ? "" : "..."}
         searchPlaceholder="Buscar..."
         value={categoryId}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
-        onChange={categoryIdNew => {
+        onChange={(categoryIdNew) => {
           setCategoryId(categoryIdNew.value);
         }}
       />
@@ -203,7 +210,7 @@ export default function EventForm({ event, addNewForm, eventDate, fetchEvents })
             onPress={() => setOpen(true)}
             style={styles.inputBox}
           >
-            <FontAwesome6 name="clock" size={15} style={styles.inputIcon} />
+            <FontAwesome6 name="clock" size={18} style={styles.inputIcon} />
           </TouchableOpacity>
           <DateTimePicker
             isVisible={open}
@@ -218,6 +225,25 @@ export default function EventForm({ event, addNewForm, eventDate, fetchEvents })
             placeholder="Clique no ícone"
           />
         </View>
+      </View>
+      <View>
+        <Text style={styles.label}>Privacidade</Text>
+        <RadioButton.Group onValueChange={newValue => setPrivacyId(newValue)} value={privacyId}>
+          <View style={styles.radioContainer}>
+            <View style={styles.radioButton}>
+              <RadioButton value={3}/>
+              <Text>Público</Text>
+            </View>
+            <View style={styles.radioButton}>
+              <RadioButton value={1} />
+              <Text>Privado</Text>
+            </View>
+            <View style={styles.radioButton}>
+              <RadioButton value={2} />
+              <Text>Apenas amigos</Text>
+            </View>
+          </View>
+        </RadioButton.Group>
       </View>
       <View style={{ flexDirection: "row", gap: 20 }}>
         <ButtonAction icon={"trash"} action={deleteEvent} />
@@ -270,36 +296,43 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
   },
   dropdown: {
-
     borderBottomWidth: 0.5,
     borderBottomColor: "gray",
     borderRadius: 8,
-    width:'100%',
-    color: 'black',
-},
+    width: "100%",
+    color: "black",
+  },
 
-
-placeholderStyle: {
+  placeholderStyle: {
     fontSize: 14,
-    color: 'gray'
-},
-selectedTextStyle: {
+    color: "gray",
+  },
+  selectedTextStyle: {
     fontSize: 14,
-},
-iconStyle: {
+  },
+  iconStyle: {
     width: 20,
     height: 20,
-},
-inputSearchStyle: {
+  },
+  inputSearchStyle: {
     height: 40,
     fontSize: 14,
-},
-dropdownContainer: {
+  },
+  dropdownContainer: {
     flex: 1,
-    backgroundColor: '#533483',
+    backgroundColor: "#533483",
     padding: 16,
-    justifyContent: 'center',
-    alignContent: 'center',
-},
-
+    justifyContent: "center",
+    alignContent: "center",
+  },
+  radioButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+  },
+  radioContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: 8,
+  },
 });

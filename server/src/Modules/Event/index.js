@@ -8,8 +8,8 @@ export default {
       event_date,
       user_id,
       location_id,
-      privacy_id = 3,
-      eventCategoryId,
+      privacy_id,
+      category_id,
     } = req.body;
     try {
       const event = await prisma.event.create({
@@ -20,7 +20,7 @@ export default {
           user_id,
           location_id,
           privacy_id,
-          eventCategoryId,
+          category_id,
         },
       });
       res.json(event);
