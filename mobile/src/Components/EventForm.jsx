@@ -27,9 +27,7 @@ export default function EventForm({
   const [local, setLocal] = useState("");
   const [time, setTime] = useState("");
   const [date, setDate] = useState(new Date());
-  const [categoryId, setCategoryId] = useState(1);
-  const [privacyId, setPrivacyId] = useState(3);
-
+  const [categoryId, setCategoryId] = useState(1)
   //controlar o modal de hora
   const [open, setOpen] = useState(false);
   // id do user logado
@@ -66,8 +64,6 @@ export default function EventForm({
       setTitle(event.title);
       setDescription(event.description);
       setLocal(event.location);
-      setPrivacyId(event.privacy_id);
-      setCategoryId(event.category_id)
       const d = new Date(event.event_date);
       const hours = d.getUTCHours();
       const minutes = d.getUTCMinutes();
@@ -79,12 +75,12 @@ export default function EventForm({
   }, [event]);
 
   function cleanFields() {
-    setTitle("");
-    setDescription("");
-    setLocal("");
-    setTime("");
-    setDate(new Date());
-    fetchEvents(eventDate);
+    setTitle('')
+    setDescription('')
+    setLocal('')
+    setTime('')
+    setDate(new Date())
+    fetchEvents(eventDate)
   }
 
   async function handleEvent() {
@@ -102,9 +98,7 @@ export default function EventForm({
       location_id: 2,
       local: local,
       event_date: newEventDate,
-      event_category: categoryId,
-
-      privacy_id: privacyId,
+      event_category: categoryId
     };
     //update nao funcionou
     if (event) {
