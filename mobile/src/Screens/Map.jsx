@@ -1,10 +1,11 @@
 import { useEffect, useState, useRef } from "react";
-import { SafeAreaView, Text, View, StyleSheet, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, ScrollView } from "react-native";
+import { SafeAreaView, Text, View, StyleSheet, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, ScrollView, Modal, ViewComponent } from "react-native";
 import { Feather, FontAwesome } from "@expo/vector-icons";
 import { api } from "../Lib/axios";
 import Header from "../Components/Header"
-
+import { Checkbox } from "react-native-paper";
 import MapView, { Marker } from 'react-native-maps';
+
 
 
 
@@ -15,7 +16,7 @@ import {
     LocationAccuracy
 
 } from 'expo-location'
-import ButtonAction from "../Components/ButtonAction";
+import EventDetails from "../Components/EventDetails";
 
 
 
@@ -25,7 +26,36 @@ export default function Map({ navigation, onLogout }) {
     const mapRef = useRef(null)
     const [search, setSearch] = useState()
     const [autoComplete, setAutoComplete] = useState([])
+    const [categories, setCategories] = useState([]);
+    const [filterVisible, setFilterVisible] = useState(false)
+    const [eventDetailsVisible, setEventDetailsVisible] = useState(false)
+    const [selectedEvent, setSelectedEvent] = useState(null)
+    const [events, setEvents] = useState([])
 
+    function toggleFilter() {
+        setFilterVisible(!filterVisible)
+    }
+
+    async function fetchCategories() {
+        try {
+            const response = await api.get(`/event/category/list`);
+            const data = response.data;
+            setCategories(data);
+            console.log(data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    async function fetchEvents() {
+        try {
+            const response = await api.get(`/event/list`);
+            const data = response.data;
+            setEvents(data);
+            console.log(data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
 
     const mapStyle = [
@@ -126,6 +156,10 @@ export default function Map({ navigation, onLogout }) {
 
     }
 
+    function showEventDetails(event) {
+        setSelectedEvent(event)
+        setEventDetailsVisible(true)
+    }
     useEffect(() => {
         const fetchData = async () => {
             const permissionGranted = await requestLocationPermission();
@@ -147,6 +181,8 @@ export default function Map({ navigation, onLogout }) {
 
         };
         fetchData();
+        fetchCategories();
+        fetchEvents();
         console.log(position)
     }, []);
 
@@ -172,6 +208,7 @@ export default function Map({ navigation, onLogout }) {
                                             placeholder="Search for a location"
                                             style={{ maxHeight: 50 }}
                                             onChangeText={(val) => { AutoCompleteFetch(val); setSearch(val) }}
+                                            onPress={() => {setFilterVisible(false); setEventDetailsVisible(false)}}
                                         />
                                         <TouchableOpacity style={styles.sendIcon}>
                                             <FontAwesome name="search" size={20} color="black" />
@@ -180,13 +217,13 @@ export default function Map({ navigation, onLogout }) {
                                     <TouchableOpacity
                                         style={styles.iconButton}
                                         activeOpacity={0.5}
-                                       
+                                        onPress={() => toggleFilter()}
                                     >
                                         <FontAwesome name='filter' size={20} color={'black'} />
                                     </TouchableOpacity>
                                 </View>
                                 {
-                                    autoComplete.length > 0 && search &&
+                                    autoComplete.length > 0 && search && !filterVisible &&
                                     <ScrollView style={styles.suggestions}>
                                         {
                                             autoComplete.map((suggestion, index) => (
@@ -206,12 +243,43 @@ export default function Map({ navigation, onLogout }) {
                                         }
                                     </ScrollView>
                                 }
+                                {
+                                    categories.length > 0 && filterVisible &&
+                                    <ScrollView style={styles.suggestions}>
+                                        {
+                                            categories.map((category, index) => (
+
+                                                <View key={index} style={{ borderBottomWidth: 0.5, width: '100%', justifyContent: 'center' }}>
+
+                                                    <Checkbox.Item
+                                                        label={category.title}
+                                                        key={index}
+                                                        color="red"
+                                                        labelStyle={styles.subtitle && { fontSize: 13 }}
+                                                        style={{ color: 'black', paddingVertical: 0, paddingHorizontal: 0, height: 30 }}
+                                                        status={category.checked ? 'checked' : 'unchecked'}
+                                                        onPress={() => {
+                                                            setCategories(categories.map((cat, idx) => {
+                                                                if (idx === index) cat.checked = !cat.checked;
+                                                                return cat;
+                                                            }));
+                                                        }}
+                                                    >
+                                                    </Checkbox.Item>
+
+                                                </View>
+                                            ))
+                                        }
+                                    </ScrollView>
+                                }
+
                             </KeyboardAvoidingView>
                         </View>
                         <MapView
                             ref={mapRef}
                             style={styles.map}
                             customMapStyle={mapStyle}
+                            
                             initialRegion={{
                                 latitude: position.coords.latitude,
                                 longitude: position.coords.longitude,
@@ -219,17 +287,49 @@ export default function Map({ navigation, onLogout }) {
                                 longitudeDelta: 0.005
                             }}
 
-                            onTouchStart={() => setAutoComplete([])}
+
+
+                            onTouchStart={() => {
+                                setAutoComplete([])
+                                setFilterVisible(false)
+                                setEventDetailsVisible(false)
+                            }}
                         >
-                            <Marker
+                            <Marker //user marker
                                 coordinate={{
                                     latitude: position.coords.latitude,
                                     longitude: position.coords.longitude,
                                 }}
-                            >
+                                tracksViewChanges={false}
+                                image={require('../../assets/markers/User.png')}
+                            />
+                            {
+                                events.length > 0 &&
+                                events.map((event, index) => (
+                                    <Marker //event marker
+                                        coordinate={{
+                                            latitude: event.location.latitude,
+                                            longitude: event.location.longitude,
+                                        }}
+                                        key={index}
+                                        tracksViewChanges={false}
+                                        image={require('../../assets/markers/Não definido.png')}
+                                        onPress={() => showEventDetails(event)}
+                                    />
+                                ))
+                            }
 
-                            </Marker>
                         </MapView>
+                        {
+                            eventDetailsVisible &&
+                            <View style={styles.EventDetailView}>
+
+                                <EventDetails event={selectedEvent}></EventDetails>
+
+                            </View>
+
+
+                        }
                     </View>
 
                 }
@@ -304,6 +404,21 @@ const styles = StyleSheet.create({
 
 
     },
+    EventDetailView: {
+        position: "absolute",
+        width: '100%',
+        bottom: 250,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        padding: 10,
+        alignSelf: 'center',
+        justifyContent: 'center',
+        zIndex: 1,
+        elevation: 50
+
+
+    },
     inputsearch: {
         backgroundColor: "#fff",
         borderRadius: 30,
@@ -329,8 +444,9 @@ const styles = StyleSheet.create({
         flex: 1,
         elevation: 50,
         paddingHorizontal: 17,
-        paddingVertical: 10,
+        paddingVertical: 5,
         borderRadius: 24,
+        maxHeight: 300
     },
     iconButton: {
         backgroundColor: "white",
@@ -343,6 +459,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         elevation: 50
 
+    },
+    checkBox: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 2,
+        zIndex: 2
     },
 },
 

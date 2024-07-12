@@ -231,14 +231,15 @@ export default function Home({ navigation, onLogout }) {
                                 longitudeDelta: 0.005
                             }}
                         >
-                            <Marker
+                            <Marker //user marker
                                 coordinate={{
                                     latitude: position.coords.latitude,
                                     longitude: position.coords.longitude,
                                 }}
-                            >
-
-                            </Marker>
+                                tracksViewChanges={false}
+                                image={require('../../assets/markers/User.png')}
+                            />
+                            
                         </MapView>
                     </TouchableOpacity>
 

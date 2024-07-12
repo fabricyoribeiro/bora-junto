@@ -1,19 +1,19 @@
 
-import event from "../modules/Event/index.js";
+import Event from "../Modules/Event/index.js"
 import { Router } from "express";
 
 const eventRoutes = Router();
 
-eventRoutes.post("/", event.createEvent)
-eventRoutes.get("/list", event.findAllEvents)
-eventRoutes.get("/privacy/:id", event.findAllEventsByPrivacy)
-eventRoutes.get("/user/:id", event.findAllEventsByUser)
-eventRoutes.get("/:id", event.findEventById)
-eventRoutes.get("/date/:date", event.findAllEventsByDate)
-eventRoutes.put("/:id", event.updateEvent)
-eventRoutes.delete("/:id", event.deleteEvent)
+eventRoutes.post("/", Event.createEvent)
+eventRoutes.get("/list", Event.findAllEvents)
+eventRoutes.get("/privacy/:id", Event.findAllEventsByPrivacy)
+eventRoutes.get("/user/:id", Event.findAllEventsByUser)
+eventRoutes.get("/:id", Event.findEventById)
+eventRoutes.get("/date/:date", Event.findAllEventsByDate)
+eventRoutes.put("/:id", Event.updateEvent)
+eventRoutes.delete("/:id", Event.deleteEvent)
 
-eventRoutes.get("/category/list", event.findAllCategories)
+eventRoutes.get("/category/list", Event.findAllCategories)
 
 
 export {eventRoutes}

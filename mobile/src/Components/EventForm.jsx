@@ -228,15 +228,15 @@ export default function EventForm({
         <RadioButton.Group onValueChange={newValue => setPrivacyId(newValue)} value={privacyId}>
           <View style={styles.radioContainer}>
             <View style={styles.radioButton}>
-              <RadioButton value={3}/>
+              <RadioButton value={3} color="red"/>
               <Text>Público</Text>
             </View>
             <View style={styles.radioButton}>
-              <RadioButton value={1} />
+              <RadioButton value={1} color="red"/>
               <Text>Privado</Text>
             </View>
             <View style={styles.radioButton}>
-              <RadioButton value={2} />
+              <RadioButton value={2} color="red"/>
               <Text>Apenas amigos</Text>
             </View>
           </View>
@@ -325,11 +325,11 @@ const styles = StyleSheet.create({
   radioButton: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 2,
+    gap: 2
   },
   radioContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginVertical: 8,
+    marginVertical: 8
   },
 });

@@ -127,10 +127,7 @@ export default {
     //erro de segurança, futuramente esse método vai ser alterado, por enquanto é só pra ir testando o mapa
     try {
       const event = await prisma.event.findMany({
-        where: {
-          OR: [{ privacy_id: 3 }, { privacy_id: 2 }, { privacy_id: 1 }],
-        },
-        include: { location: true, privacy: true },
+        include: { location: true, privacy: true, eventCategory: true},
       }); //apenas simulação, no futuro vai ser pego somente public e friends-only
       if (!event) return res.json({ error: "Event does not exist" });
       return res.json(event);
