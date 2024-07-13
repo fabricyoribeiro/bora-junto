@@ -8,6 +8,10 @@ import Footer from "../Components/Footer"
 import MapView, { Marker } from 'react-native-maps';
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import * as RootNavigation from '../../RootNavigation'
+import { api } from '../Lib/axios'
+import { getUserDisplayName, getUserUID } from "../Services/AuthService";
+import { useIsFocused } from '@react-navigation/native';
+
 
 
 import {
@@ -26,8 +30,15 @@ export default function Home({ navigation, onLogout }) {
     const [progress, setProgress] = useState(8);
     const [position, setPosition] = useState(null)
     const mapRef = useRef(null)
+    
+    const [username, setUsername] = useState(null)
+    // const [userId, setUserId] = useState(null)
+
+    const userId = getUserUID();
+    console.log("ID-------",userId)
 
 
+    const [activityForToday, setActivityForToday] = useState(null)
 
 
     const mapStyle = [
@@ -127,6 +138,41 @@ export default function Home({ navigation, onLogout }) {
 
     }
 
+
+    async function fetchAtivityForToday(){
+        try {
+            const currentDate = new Date()
+            const formattedDate = currentDate.toISOString().slice(0, 10)
+
+            const response = await api.get(`/event/date/${formattedDate}`, {
+                params: {
+                    user_id: userId,
+                }
+            })
+            const data = response.data
+            if(!data){
+                setActivityForToday(null)
+                return
+            }
+            setActivityForToday(data[0].title)
+        } catch (error) {
+            setActivityForToday(null)
+
+            console.log("m",error);
+            
+        }
+    }  
+
+    async function fechtUsername(id){
+        try {
+            const response = await api.get(`/user/${id}`)
+            const data = response.data
+            setUsername(data.name)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     useEffect(() => {
         const fetchData = async () => {
             const permissionGranted = await requestLocationPermission();
@@ -153,14 +199,26 @@ export default function Home({ navigation, onLogout }) {
             }
 
         };
+        // setUserId(userId)
+        console.log('IDDDD',userId)
+        fechtUsername(userId)
         fetchData();
         console.log(position)
     }, []);
 
 
+    const isFocused = useIsFocused();
+    useEffect(()=> {
+        fetchAtivityForToday()
+    }, [isFocused])
+
+
+    
+
+
     return (
         <View style={styles.bg}>
-            <Header title={'Eaí João!'} onLogout={onLogout}/>
+            <Header title={`Eai, ${username}`} onLogout={onLogout}/>
 
             <View style={styles.container}>
                 <TouchableOpacity style={styles.block} activeOpacity={0.5} onPress={() => { RootNavigation.navigate("Agenda") }}>
@@ -183,10 +241,21 @@ export default function Home({ navigation, onLogout }) {
                             </View>
                         )}
                     </AnimatedCircularProgress>
-                    <View style={{ justifyContent: 'center' }}>
-                        <Text style={styles.subtitle}>Hoje é dia de</Text>
-                        <Text style={styles.title}>Corrida</Text>
-                    </View>
+
+                    {
+                        activityForToday ? (
+                            <View style={{ justifyContent: 'center' }}>
+                                <Text style={styles.subtitle}>Hoje é dia de</Text>
+                                <Text style={styles.title}>{activityForToday}</Text>
+                            </View>
+                            
+                        ) : (
+
+                            <View style={{ justifyContent: 'center' }}>
+                                <Text style={styles.subtitle}>Definir atividade</Text>
+                            </View>
+                        )
+                    }
                     <Ionicons name="calendar" size={20} color="black" style={{ bottom: 20, right: 20, position: 'absolute' }} />
                 </TouchableOpacity >
                 {
