@@ -11,16 +11,38 @@ export default {
       privacy_id,
       category_id,
     } = req.body;
+    console.log("TESTE",location_id, privacy_id, category_id)
     try {
       const event = await prisma.event.create({
         data: {
           title,
           description,
           event_date,
-          user_id,
-          location_id,
-          privacy_id,
-          category_id,
+          // user_id,
+          // location_id,
+          // privacy_id,
+          // category_id,
+          user: {
+            connect: {
+              id: user_id,
+            },
+          },
+          privacy: {
+            connect: {
+              id: privacy_id,
+            },
+          },
+          eventCategory: {
+            connect: {
+              id: category_id,
+            },
+          },
+          location: {
+            connect: {
+              id: location_id,
+            },
+          }
+
         },
       });
       res.json(event);
