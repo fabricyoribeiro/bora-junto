@@ -17,6 +17,8 @@ import EventForm from "../Components/EventForm";
 import Header from "../Components/Header";
 import { getUserUID } from "../Services/AuthService";
 import Loading from "../Components/Loading.jsx";
+import { Modal } from "react-native-paper";
+import ButtonAction from "../Components/ButtonAction.jsx";
 
 
 const { width } = Dimensions.get("window");
@@ -59,8 +61,10 @@ export default function Agenda({ onLogout }) {
   }, [week]);
 
   useEffect(() => {
-    fetchEvents();
-  }, [value]);
+    const currentDate = new Date()
+    const formattedDate = currentDate.toISOString().slice(0, 10)
+    fetchEvents(formattedDate);
+  }, []);
 
   // esse fetch pega por usuario
   // async function fetchEvents() {
@@ -202,6 +206,7 @@ export default function Agenda({ onLogout }) {
               />
             ))}
         </ScrollView>
+        
       </View>
     </SafeAreaView>
   );

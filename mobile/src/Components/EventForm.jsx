@@ -14,7 +14,9 @@ import DateTimePicker from "react-native-modal-datetime-picker";
 import { format } from "date-fns";
 import { Dropdown } from "react-native-element-dropdown";
 import Checkbox from "expo-checkbox";
-import { RadioButton } from "react-native-paper";
+import { Modal, RadioButton } from "react-native-paper";
+import ReactNativeModal from "react-native-modal";
+
 
 export default function EventForm({
   event,
@@ -57,7 +59,7 @@ export default function EventForm({
     setDate(adjustmentDate);
     setOpen(false);
     setTime(String(format(new Date(date), "HH:mm")));
-  };
+  }; 
 
   useEffect(() => {
     fetchCategories();
@@ -101,7 +103,8 @@ export default function EventForm({
       location_id: 2,
       local: local,
       event_date: newEventDate,
-      event_category: categoryId
+      category_id: categoryId,
+      privacy_id: privacyId,
     };
     //update nao funcionou
     if (event) {
@@ -247,19 +250,23 @@ export default function EventForm({
         <ButtonAction icon={"plus"} action={addNewForm} />
         <ButtonAction text={"Salvar"} action={handleEvent} />
       </View>
+
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   block: {
-    backgroundColor: "#EAEAEA",
+    backgroundColor: "#eaeaea84",
     width: "100%",
     padding: 20,
     borderRadius: 24,
     flexDirection: "col",
     gap: 15,
     marginBottom: 20,
+    borderColor: '#c4c4c4ce',
+    borderWidth: 1,
+    
   },
   title: {
     fontFamily: "Montserrat-BoldItalic",
@@ -274,7 +281,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: "Montserrat-Italic",
-    color: "gray",
+    color: "black",
     fontSize: 12,
   },
   textInput: {
