@@ -5,6 +5,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  Modal
 } from "react-native";
 import ButtonAction from "../Components/ButtonAction";
 import { Entypo, FontAwesome, FontAwesome6 } from "@expo/vector-icons";
@@ -14,9 +15,9 @@ import DateTimePicker from "react-native-modal-datetime-picker";
 import { format } from "date-fns";
 import { Dropdown } from "react-native-element-dropdown";
 import Checkbox from "expo-checkbox";
-import { Modal, RadioButton } from "react-native-paper";
+import { RadioButton } from "react-native-paper";
 import ReactNativeModal from "react-native-modal";
-
+import PlaceEvent from "../Components/PlaceEvent"
 
 export default function EventForm({
   event,
@@ -39,6 +40,11 @@ export default function EventForm({
   //categorias dropdown
   const [isFocus, setIsFocus] = useState(false);
   const [categories, setCategories] = useState([]);
+
+  const [modalVisible, setModalVisible] = useState(false)
+  const toggleModal = () => {
+    setModalVisible(!modalVisible)
+  }
 
   async function fetchCategories(date) {
     try {
@@ -198,9 +204,11 @@ export default function EventForm({
           <TextInput
             style={styles.textInput}
             value={local}
+            editable={false}
+            placeholder="Clique no ícone"
             onChangeText={setLocal}
           />
-          <Entypo name="location-pin" size={20} style={styles.inputIcon} />
+          <Entypo name="location-pin" size={20} style={styles.inputIcon} onPress={() => toggleModal()}/>
         </View>
       </View>
       <View>
@@ -250,7 +258,18 @@ export default function EventForm({
         <ButtonAction icon={"plus"} action={addNewForm} />
         <ButtonAction text={"Salvar"} action={handleEvent} />
       </View>
+      <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            statusBarTranslucent
+            onRequestClose={() => {
+              Alert.alert('Modal has been closed.');
+              setModalVisible(!modalVisible);
+            }}>
+              <PlaceEvent close={()=>toggleModal()}/>
 
+          </Modal>
     </View>
   );
 }

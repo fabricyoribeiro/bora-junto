@@ -82,7 +82,7 @@ export default function EventDetails({
             </View>
 
             <View style={{ flexDirection: "row", gap: 20 }}>
-                <ButtonAction text={"Participar"} />
+                <ButtonAction text={"Participar"}/>
             </View>
         </View>
     );

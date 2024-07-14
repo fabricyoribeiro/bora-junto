@@ -7,6 +7,7 @@ import {
   View,
   Text,
   ScrollView,
+  Modal
 } from "react-native";
 import moment from "moment";
 import Swiper from "react-native-swiper";
@@ -17,9 +18,8 @@ import EventForm from "../Components/EventForm";
 import Header from "../Components/Header";
 import { getUserUID } from "../Services/AuthService";
 import Loading from "../Components/Loading.jsx";
-import { Modal } from "react-native-paper";
 import ButtonAction from "../Components/ButtonAction.jsx";
-
+import PlaceEvent from "../Components/PlaceEvent.jsx"
 
 const { width } = Dimensions.get("window");
 
@@ -53,7 +53,7 @@ export default function Agenda({ onLogout }) {
         const date = moment(start).add(adj, "week").add(index, "day");
 
         return {
-          weekday: date.format("ddd"),
+          weekday: format(new Date(date), "EEE", { locale: pt }).toUpperCase(),
           date: date.toDate(),
         };
       });
@@ -185,15 +185,15 @@ export default function Agenda({ onLogout }) {
         </Text>
         <ScrollView
           style={{ flex: 1, flexDirection: "column", marginBottom: 100 }}
-          >
-          <Loading visible={loading}/>
+        >
+          <Loading visible={loading} />
           {Array.isArray(events) &&
             events.map((event, index) => (
               <EventForm
-              key={event.id}
-              event={event}
-              addNewForm={addNewEventForm}
-              delete={() => deleteEvent(event.id)}
+                key={event.id}
+                event={event}
+                addNewForm={addNewEventForm}
+                delete={() => deleteEvent(event.id)}
               />
             ))}
           {Array.isArray(newEventForms) &&
@@ -205,8 +205,9 @@ export default function Agenda({ onLogout }) {
                 fetchEvents={fetchEvents}
               />
             ))}
+
         </ScrollView>
-        
+
       </View>
     </SafeAreaView>
   );
@@ -336,7 +337,7 @@ const styles = StyleSheet.create({
   textInput: {
     borderBottomWidth: 0.5,
     borderBottomColor: "gray",
-    minHeight: 40,
+    minHeight: 100,
     width: "100%",
     maxHeight: 180,
     paddingRight: 20,
