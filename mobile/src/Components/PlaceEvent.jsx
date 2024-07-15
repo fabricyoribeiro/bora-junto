@@ -20,13 +20,15 @@ import EventDetails from "../Components/EventDetails";
 
 
 
-export default function Map({ navigation, onLogout, close }) {
+export default function Map({ navigation, onLogout, close, onSubmit}) {
 
     const [position, setPosition] = useState(null)
     const mapRef = useRef(null)
     const [search, setSearch] = useState()
     const [autoComplete, setAutoComplete] = useState([])
-
+    const [region, setRegion] = useState(null)
+    const [localAddress, setLocalAddress] = useState(null);
+    const [submitPending, setSubmitPending] = useState(false); 
 
     const mapStyle = [
         {
@@ -104,8 +106,22 @@ export default function Map({ navigation, onLogout, close }) {
 
     async function AutoCompleteFetch(val) {
         try {
-            const response = await api.get(`https://api.locationiq.com/v1/autocomplete?key=pk.b841bb433e74583e013fbc6a0c2fbb6c&q=${val}&limit=5&dedupe=1&`);
+            const response = await api.get(`https://api.locationiq.com/v1/autocomplete?key=pk.b841bb433e74583e013fbc6a0c2fbb6c&q=${val}&limit=5&dedupe=1&accept-language=pt-br`);
             setAutoComplete(response.data);
+            console.log(response.data);
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    function formatLocationAddress(location) {
+        const { road, neighbourhood, town, state, postcode } = location.address;
+        return `${road ? road + ', ': ''}${neighbourhood ? neighbourhood + ', ' : ''}${town ? town + ' - ' : ''}${state ? state : ''}`;
+    }
+    async function AddressFetch(val) {
+        try {
+            const response = await api.get(`https://us1.locationiq.com/v1/reverse?key=pk.b841bb433e74583e013fbc6a0c2fbb6c&lat=${val.latitude}&lon=${val.longitude}&format=json&accept-language=pt-br`);
+            setLocalAddress(formatLocationAddress(response.data));
             console.log(response.data);
 
         } catch (error) {
@@ -121,11 +137,7 @@ export default function Map({ navigation, onLogout, close }) {
             return true
         }
         return false
-
-
-
     }
-
 
     useEffect(() => {
         const fetchData = async () => {
@@ -151,7 +163,16 @@ export default function Map({ navigation, onLogout, close }) {
         console.log(position)
     }, []);
 
-
+    useEffect(() => {
+        if (localAddress) {
+            onSubmit({
+                address: localAddress,
+                latitude: region.latitude,
+                longitude: region.longitude
+            });
+            close();
+        }
+    }, [localAddress]);
     return (
 
 
@@ -162,7 +183,7 @@ export default function Map({ navigation, onLogout, close }) {
                 position &&
                 <View style={styles.mapblock}>
                     <View style={{ flexDirection: 'column' }}>
-                        <View style={styles.inputView}>
+                        <KeyboardAvoidingView style={styles.inputView}>
                             <View style={{ flex: 1, flexDirection: 'row', gap: 15, elevation: 50 }}>
                                 <View style={styles.inputsearch}>
                                     <TextInput
@@ -171,7 +192,7 @@ export default function Map({ navigation, onLogout, close }) {
                                         placeholder="Buscar"
                                         style={{ maxHeight: 50 }}
                                         onChangeText={(val) => { AutoCompleteFetch(val); setSearch(val) }}
-                                       
+
                                     />
                                     <TouchableOpacity style={styles.sendIcon}>
                                         <FontAwesome name="search" size={20} color="black" />
@@ -187,7 +208,7 @@ export default function Map({ navigation, onLogout, close }) {
                             </View>
                             {
                                 autoComplete.length > 0 && search &&
-                                <ScrollView style={styles.suggestions}>
+                                <ScrollView style={styles.suggestions} >
                                     {
                                         autoComplete.map((suggestion, index) => (
                                             <TouchableOpacity key={index} style={{ borderBottomWidth: 0.5, paddingVertical: 5 }} onPress={() => {
@@ -196,16 +217,13 @@ export default function Map({ navigation, onLogout, close }) {
                                                     center: { longitude: Number(suggestion.lon), latitude: Number(suggestion.lat) }
                                                 })
                                             }}>
-                                                <Text style={{ color: 'black', zIndex: 2 }}>{suggestion.address.name ? suggestion.address.name + ', ' : null}
-                                                    {suggestion.address.suburb ? suggestion.address.suburb + ', ' : null}
-                                                    {suggestion.address.city ? suggestion.address.city + ', ' : null}
-                                                    {suggestion.address.state ? suggestion.address.state : null}</Text>
+                                                <Text style={{ color: 'black', zIndex: 2 }}>{formatLocationAddress(suggestion)}</Text>
                                             </TouchableOpacity>
                                         ))
                                     }
                                 </ScrollView>
                             }
-                        </View>
+                        </KeyboardAvoidingView>
                     </View>
                     <MapView
                         ref={mapRef}
@@ -218,25 +236,21 @@ export default function Map({ navigation, onLogout, close }) {
                             latitudeDelta: 0.005,
                             longitudeDelta: 0.005
                         }}
+                        onRegionChangeComplete={(region) => setRegion(region)}
                         onTouchStart={() => {
                             setAutoComplete([]);
                         }}
                     >
-                        {/* <Marker //user marker
-                            coordinate={{
-                                latitude: position.coords.latitude,
-                                longitude: position.coords.longitude,
-                            }}
-                            tracksViewChanges={false}
-                            image={require('../../assets/markers/New event.png')}
-                        /> */}
                     </MapView>
-                        <View style={{position:'absolute',height:'100%', width:'100%', alignItems:'center', justifyContent:'center'}}>
-                            <Image width={48} height={48} resizeMode="contain" source={require('../../assets/markers/New event.png')} />
-                        </View>
-                        <View style={{ position: 'absolute', bottom: 0,flexDirection:'row', margin: 10, elevation: 50}}>
-                            <ButtonAction text={"Selecionar localização"} />
-                        </View>
+                    <View style={{ position: 'absolute', height: '100%', width: '100%', alignItems: 'center', justifyContent: 'center' }}>
+                        <Image width={48} height={48} resizeMode="contain" source={require('../../assets/markers/New event.png')} />
+                    </View>
+                    <View style={{ position: 'absolute', bottom: 0, flexDirection: 'row', margin: 10, elevation: 50 }}>
+                        <ButtonAction text={"Selecionar localização"} action={() => {
+                            AddressFetch(region)
+
+                            }} />
+                    </View>
                 </View >
             }
         </View >
@@ -293,7 +307,7 @@ const styles = StyleSheet.create({
     inputView: {
         display: "flex",
         flexDirection: "column",
-        gap: 15,
+        gap: 40,
         padding: 5,
         zIndex: 1,
         marginTop: 30
@@ -335,6 +349,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 17,
         paddingVertical: 5,
         borderRadius: 24,
+        minHeight: 170,
         maxHeight: 300,
     },
     iconButton: {

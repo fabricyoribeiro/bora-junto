@@ -164,13 +164,14 @@ model Privacy {
 
 model Location {
   id                Int   @id @default(autoincrement())
-  accuracy          Float
-  altitude          Float
-  altitude_accuracy Float
-  heading           Float
+  address           String?
+  accuracy          Float?
+  altitude          Float?
+  altitude_accuracy Float?
+  heading           Float?
   latitude          Float
   longitude         Float
-  speed             Float
+  speed             Float?
 
   user  User[]
   event Event[]

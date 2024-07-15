@@ -33,7 +33,6 @@ export default function Agenda({ onLogout }) {
 
   // user que ta logado
   const userId = getUserUID();
-  console.log("ID USUARIO", userId);
 
   const addNewEventForm = () => {
     setNewEventForms([...newEventForms, { id: newEventForms.length + 1 }]);

@@ -5,7 +5,8 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Modal
+  Modal,
+  TouchableWithoutFeedback
 } from "react-native";
 import ButtonAction from "../Components/ButtonAction";
 import { Entypo, FontAwesome, FontAwesome6 } from "@expo/vector-icons";
@@ -27,7 +28,11 @@ export default function EventForm({
 }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [local, setLocal] = useState("");
+  const [local, setLocal] = useState({
+    address:'',
+    latitude:'',
+    longitude:''
+  });
   const [time, setTime] = useState("");
   const [date, setDate] = useState(new Date());
   const [categoryId, setCategoryId] = useState(1)
@@ -56,6 +61,7 @@ export default function EventForm({
       console.log(error);
     }
   }
+
 
   const handleConfirm = (date) => {
     //o input de data pega 3 horas à frente, precisa ajustar
@@ -200,16 +206,16 @@ export default function EventForm({
       />
       <View>
         <Text style={styles.label}>Local</Text>
-        <View style={styles.inputBox}>
-          <TextInput
+        <TouchableOpacity style={styles.inputBox} onPress={()=>toggleModal()}>
+          <Text
             style={styles.textInput}
-            value={local}
             editable={false}
             placeholder="Clique no ícone"
             onChangeText={setLocal}
-          />
+          >{local.address}
+          </Text>
           <Entypo name="location-pin" size={20} style={styles.inputIcon} onPress={() => toggleModal()}/>
-        </View>
+        </TouchableOpacity>
       </View>
       <View>
         <Text style={styles.label}>Horário</Text>
@@ -267,7 +273,7 @@ export default function EventForm({
               Alert.alert('Modal has been closed.');
               setModalVisible(!modalVisible);
             }}>
-              <PlaceEvent close={()=>toggleModal()}/>
+              <PlaceEvent close={()=>toggleModal()} onSubmit={(val)=>{setLocal(val); console.log(local.address)}}/>
 
           </Modal>
     </View>

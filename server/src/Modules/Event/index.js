@@ -10,6 +10,7 @@ export default {
       location_id,
       privacy_id,
       category_id,
+      location
     } = req.body;
     console.log("TESTE",location_id, privacy_id, category_id)
     try {
@@ -38,7 +39,7 @@ export default {
             },
           },
           location: {
-            connect: {
+            create: {
               id: location_id,
             },
           }

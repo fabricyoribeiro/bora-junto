@@ -35,7 +35,6 @@ export default function Home({ navigation, onLogout }) {
     // const [userId, setUserId] = useState(null)
 
     const userId = getUserUID();
-    console.log("ID-------",userId)
 
 
     const [activityForToday, setActivityForToday] = useState(null)
