@@ -136,7 +136,7 @@ model EventCategory {
 }
 
 model Event {
-  id          Int      @id @default(autoincrement())
+  id          Int      @id @default(autoincrement()) 
   title       String   @db.VarChar(255)
   description String?  @db.VarChar(255)
   event_date  DateTime

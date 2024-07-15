@@ -7,12 +7,13 @@ export default {
       description,
       event_date,
       user_id,
-      location_id,
       privacy_id,
       category_id,
-      location
+      address,
+      latitude,
+      longitude
     } = req.body;
-    console.log("TESTE",location_id, privacy_id, category_id)
+    console.log("TESTE", privacy_id, category_id)
     try {
       const event = await prisma.event.create({
         data: {
@@ -40,7 +41,9 @@ export default {
           },
           location: {
             create: {
-              id: location_id,
+              address: address,
+              latitude: latitude,
+              longitude: longitude
             },
           }
 
@@ -187,6 +190,9 @@ export default {
             lte: endOfDay,
           },
         },
+        include:{
+          location:true
+        }
       });
 
       if (!events || events.length === 0) {

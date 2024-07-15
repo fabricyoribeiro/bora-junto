@@ -78,7 +78,11 @@ export default function EventForm({
     if (event) {
       setTitle(event.title);
       setDescription(event.description);
-      setLocal(event.location);
+      setLocal({
+        longitude: event.location.longitude,
+        latitude: event.location.latitude,
+        address: event.location.address
+      });
       setPrivacyId(event.privacy_id)
       setCategoryId(event.category_id)
       const d = new Date(event.event_date);
@@ -112,13 +116,15 @@ export default function EventForm({
       title: title,
       description: description,
       //esse 2 é o id de um location cadastrado
-      location_id: 2,
-      local: local,
+      address: local.address,
+      latitude: local.latitude,
+      longitude: local.longitude,
       event_date: newEventDate,
       category_id: categoryId,
       privacy_id: privacyId,
     };
     //update nao funcionou
+    console.log(newEvent)
     if (event) {
       try {
         const response = await api.put(`/event/${event.id}`, newEvent);
