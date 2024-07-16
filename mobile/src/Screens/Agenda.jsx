@@ -8,6 +8,7 @@ import {
   Text,
   ScrollView,
   Modal,
+  StatusBar,
 } from "react-native";
 import moment from "moment";
 import Swiper from "react-native-swiper";
@@ -102,6 +103,11 @@ export default function Agenda({ onLogout }) {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "white" }}>
+      <StatusBar 
+        barStyle="dark-content"
+        backgroundColor="transparent"
+        translucent 
+      />
       <Header title="Agenda" onLogout={onLogout} />
       <View style={styles.container}>
         <View style={styles.picker}>

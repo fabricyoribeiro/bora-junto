@@ -2,5 +2,5 @@ import axios from 'axios'
 
 //colocar seu ip
 export const api = axios.create({
-    baseURL: 'http://192.168.1.109:3030'
+    baseURL: process.env.EXPO_PUBLIC_AXIOS_BASE_URL
 })

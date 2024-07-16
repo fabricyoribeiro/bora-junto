@@ -22,11 +22,13 @@ const useToastConfig = () => {
     error: (props) => (
       <ErrorToast
         {...props}
+        style={{ borderLeftColor: 'red' }}
+        
         text1Style={{
-          fontSize: 17
+          fontSize: 16
         }}
         text2Style={{
-          fontSize: 15
+          fontSize: 14
         }}
       />
     ),
@@ -38,10 +40,10 @@ const useToastConfig = () => {
     )
   };
 
-  const showToast = (text) => {
+  const showToast = (text, type='success') => {
     Toast.show({
-      type: 'success',
-      text1: 'Tudo certo!',
+      type: `${type}`,
+      text1: type === 'success' ? "Tudo certo!" : "Houve um erro",
       text2: `${text}`
     });
   }

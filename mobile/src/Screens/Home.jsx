@@ -1,6 +1,6 @@
-import { StatusBar } from "expo-status-bar";
+// import { StatusBar } from "expo-status-bar";
 import { useEffect, useState, useRef } from "react";
-import { SafeAreaView, Text, View, StyleSheet, TextInput, TouchableOpacity, Image} from "react-native";
+import { SafeAreaView, Text, View, StyleSheet, TextInput, TouchableOpacity, Image, StatusBar } from "react-native";
 import { FontAwesome6, Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
 import Header from "../Components/Header"
@@ -30,7 +30,7 @@ export default function Home({ navigation, onLogout }) {
     const [progress, setProgress] = useState(8);
     const [position, setPosition] = useState(null)
     const mapRef = useRef(null)
-    
+
     const [username, setUsername] = useState(null)
     // const [userId, setUserId] = useState(null)
 
@@ -138,7 +138,7 @@ export default function Home({ navigation, onLogout }) {
     }
 
 
-    async function fetchAtivityForToday(){
+    async function fetchAtivityForToday() {
         try {
             const currentDate = new Date()
             const formattedDate = currentDate.toISOString().slice(0, 10)
@@ -149,7 +149,7 @@ export default function Home({ navigation, onLogout }) {
                 }
             })
             const data = response.data
-            if(!data){
+            if (!data) {
                 setActivityForToday(null)
                 return
             }
@@ -157,12 +157,12 @@ export default function Home({ navigation, onLogout }) {
         } catch (error) {
             setActivityForToday(null)
 
-            console.log("m",error);
-            
-        }
-    }  
+            console.log("m", error);
 
-    async function fechtUsername(id){
+        }
+    }
+
+    async function fechtUsername(id) {
         try {
             const response = await api.get(`/user/${id}`)
             const data = response.data
@@ -179,7 +179,7 @@ export default function Home({ navigation, onLogout }) {
                 const { coords } = await getCurrentPositionAsync();
                 if (coords) {
                     getClima(coords.latitude, coords.longitude);
-                    
+
                     watchPositionAsync({
                         accuracy: LocationAccuracy.Highest,
                         distanceInterval: 1,
@@ -199,7 +199,7 @@ export default function Home({ navigation, onLogout }) {
 
         };
         // setUserId(userId)
-        console.log('IDDDD',userId)
+        console.log('IDDDD', userId)
         fechtUsername(userId)
         fetchData();
         console.log(position)
@@ -207,17 +207,22 @@ export default function Home({ navigation, onLogout }) {
 
 
     const isFocused = useIsFocused();
-    useEffect(()=> {
+    useEffect(() => {
         fetchAtivityForToday()
     }, [isFocused])
 
 
-    
+
 
 
     return (
         <View style={styles.bg}>
-            <Header title={`Eai, ${username}`} onLogout={onLogout}/>
+            <StatusBar
+                barStyle="dark-content"
+                backgroundColor="transparent"
+                translucent
+            />
+            <Header title={`Eai, ${username}`} onLogout={onLogout} />
 
             <View style={styles.container}>
                 <TouchableOpacity style={styles.block} activeOpacity={0.5} onPress={() => { RootNavigation.navigate("Agenda") }}>
@@ -247,7 +252,7 @@ export default function Home({ navigation, onLogout }) {
                                 <Text style={styles.subtitle}>Hoje é dia de</Text>
                                 <Text style={styles.title}>{activityForToday}</Text>
                             </View>
-                            
+
                         ) : (
 
                             <View style={{ justifyContent: 'center' }}>
@@ -287,7 +292,7 @@ export default function Home({ navigation, onLogout }) {
                 }
                 {
                     position &&
-                    <TouchableOpacity style={styles.mapblock} activeOpacity={0.9} onPress={()=>navigation.navigate('Map') }>
+                    <TouchableOpacity style={styles.mapblock} activeOpacity={0.9} onPress={() => navigation.navigate('Map')}>
                         <MapView
                             ref={mapRef}
                             style={styles.map}
@@ -307,7 +312,7 @@ export default function Home({ navigation, onLogout }) {
                                 tracksViewChanges={false}
                                 image={require('../../assets/markers/User.png')}
                             />
-                            
+
                         </MapView>
                     </TouchableOpacity>
 
@@ -393,7 +398,7 @@ const styles = StyleSheet.create({
         lef: 0,
         right: 0,
         width: '100%',
-        
+
     }
 },
 

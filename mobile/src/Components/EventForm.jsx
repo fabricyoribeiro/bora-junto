@@ -108,6 +108,11 @@ export default function EventForm({
 
   async function handleEvent() {
     setLoading(true)
+    const filledFields = checkFields()
+    if(!filledFields){
+      setLoading(false)
+      return
+    }
     //pega a data do evento e junta com a hora que vem do input
 
     // console.log("TESTE", event.event_date);
@@ -159,6 +164,15 @@ export default function EventForm({
       }
     }
     cleanFields();
+  }
+
+  const checkFields = () => {
+    
+    if(title.trim() === "" || description.trim() === "" || local.address.trim() === "" || time.trim() === ""){
+      showToast("Preencha todos os campos obrigatórios.", "error");
+      return false;
+    }
+    return true
   }
 
   async function deleteEvent() {

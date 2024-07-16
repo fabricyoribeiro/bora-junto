@@ -1,5 +1,5 @@
 import {io} from 'socket.io-client'
 
-export const socket = () => io('http://192.168.1.109:3030', {
+export const socket = () => io(process.env.EXPO_PUBLIC_SOCKET_BASE_URL, {
     reconnection: false
 })
