@@ -7,7 +7,7 @@ import {
   View,
   Text,
   ScrollView,
-  Modal
+  Modal,
 } from "react-native";
 import moment from "moment";
 import Swiper from "react-native-swiper";
@@ -19,10 +19,9 @@ import Header from "../Components/Header";
 import { getUserUID } from "../Services/AuthService";
 import Loading from "../Components/Loading.jsx";
 import ButtonAction from "../Components/ButtonAction.jsx";
-import PlaceEvent from "../Components/PlaceEvent.jsx"
-import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
+import PlaceEvent from "../Components/PlaceEvent.jsx";
+import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
 import useToastConfig from "../Hooks/useToast";
-
 
 const { width } = Dimensions.get("window");
 
@@ -32,12 +31,12 @@ export default function Agenda({ onLogout }) {
   const [week, setWeek] = useState(0);
   const [events, setEvents] = useState([]);
   const [newEventForms, setNewEventForms] = useState([{ id: 1 }]);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   // user que ta logado
   const userId = getUserUID();
 
-   const {toastConfig,showToast} = useToastConfig()
+  const { toastConfig, showToast } = useToastConfig();
 
   const addNewEventForm = () => {
     setNewEventForms([...newEventForms, { id: newEventForms.length + 1 }]);
@@ -48,7 +47,6 @@ export default function Agenda({ onLogout }) {
       newEventForms.filter((newEventForm) => newEventForm.id !== id)
     );
   };
-
 
   const weeks = useMemo(() => {
     const start = moment().add(week, "weeks").startOf("week");
@@ -66,14 +64,14 @@ export default function Agenda({ onLogout }) {
   }, [week]);
 
   useEffect(() => {
-    const currentDate = new Date()
-    const formattedDate = currentDate.toISOString().slice(0, 10)
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().slice(0, 10);
     fetchEvents(formattedDate);
   }, []);
 
   // esse fetch pega por dia e usuario
   async function fetchEvents(date) {
-    setLoading(true)
+    setLoading(true);
     try {
       console.log("fetch", date);
       console.log(moment(date).format("YYYY-MM-DD"));
@@ -88,7 +86,7 @@ export default function Agenda({ onLogout }) {
     } catch (error) {
       console.log(error);
     }
-    setLoading(false)
+    setLoading(false);
   }
 
   async function deleteEvent(id) {
@@ -200,12 +198,9 @@ export default function Agenda({ onLogout }) {
                 eventDate={value}
                 fetchEvents={fetchEvents}
                 showToast={showToast}
-
               />
             ))}
-
         </ScrollView>
-
       </View>
       <Toast config={toastConfig} />
     </SafeAreaView>

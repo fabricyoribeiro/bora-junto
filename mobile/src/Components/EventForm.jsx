@@ -6,7 +6,8 @@ import {
   TextInput,
   TouchableOpacity,
   Modal,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  ActivityIndicator
 } from "react-native";
 import ButtonAction from "../Components/ButtonAction";
 import { Entypo, FontAwesome, FontAwesome6 } from "@expo/vector-icons";
@@ -18,27 +19,27 @@ import { Dropdown } from "react-native-element-dropdown";
 import Checkbox from "expo-checkbox";
 import { RadioButton } from "react-native-paper";
 import ReactNativeModal from "react-native-modal";
-import PlaceEvent from "../Components/PlaceEvent"
-
+import PlaceEvent from "../Components/PlaceEvent";
 
 export default function EventForm({
   event,
   addNewForm,
   eventDate,
   fetchEvents,
-  showToast
+  showToast,
 }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [local, setLocal] = useState({
-    address:'',
-    latitude:'',
-    longitude:''
+    address: "",
+    latitude: "",
+    longitude: "",
   });
   const [time, setTime] = useState("");
   const [date, setDate] = useState(new Date());
-  const [categoryId, setCategoryId] = useState(1)
-  const [privacyId, setPrivacyId] = useState(1)
+  const [categoryId, setCategoryId] = useState(1);
+  const [privacyId, setPrivacyId] = useState(1);
+  const [loading, setLoading] = useState(false);
   //controlar o modal de hora
   const [open, setOpen] = useState(false);
   // id do user logado
@@ -48,12 +49,10 @@ export default function EventForm({
   const [isFocus, setIsFocus] = useState(false);
   const [categories, setCategories] = useState([]);
 
-  const [modalVisible, setModalVisible] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false);
   const toggleModal = () => {
-    setModalVisible(!modalVisible)
-  }
-
-
+    setModalVisible(!modalVisible);
+  };
 
   async function fetchCategories(date) {
     try {
@@ -66,7 +65,6 @@ export default function EventForm({
     }
   }
 
-
   const handleConfirm = (date) => {
     //o input de data pega 3 horas à frente, precisa ajustar
     const adjustmentDate = new Date(
@@ -75,7 +73,7 @@ export default function EventForm({
     setDate(adjustmentDate);
     setOpen(false);
     setTime(String(format(new Date(date), "HH:mm")));
-  }; 
+  };
 
   useEffect(() => {
     fetchCategories();
@@ -85,10 +83,10 @@ export default function EventForm({
       setLocal({
         longitude: event.location.longitude,
         latitude: event.location.latitude,
-        address: event.location.address
+        address: event.location.address,
       });
-      setPrivacyId(event.privacy_id)
-      setCategoryId(event.category_id)
+      setPrivacyId(event.privacy_id);
+      setCategoryId(event.category_id);
       const d = new Date(event.event_date);
       const hours = d.getUTCHours();
       const minutes = d.getUTCMinutes();
@@ -100,25 +98,25 @@ export default function EventForm({
   }, [event]);
 
   function cleanFields() {
-    setTitle('')
-    setDescription('')
-    setLocal('')
-    setTime('')
-    setDate(new Date())
-    fetchEvents(eventDate)
+    setTitle("");
+    setDescription("");
+    setLocal("");
+    setTime("");
+    setDate(new Date());
+    fetchEvents(eventDate);
   }
 
   async function handleEvent() {
+    setLoading(true)
     //pega a data do evento e junta com a hora que vem do input
 
-
     // console.log("TESTE", event.event_date);
-    
+
     const dateObj = new Date(eventDate);
     const datePart = dateObj.toISOString().split("T")[0];
     const newEventDate = `${datePart}T${time}:00.000Z`;
     console.log("Novo Event Date:", newEventDate);
-    
+
     const newEvent = {
       user_id: userId,
       title: title,
@@ -131,18 +129,19 @@ export default function EventForm({
       privacy_id: privacyId,
     };
     //update nao funcionou
-    console.log("NOVO EVENTO",newEvent)
+    console.log("NOVO EVENTO", newEvent);
     if (event) {
-      console.log('UPDATE')
+      console.log("UPDATE");
       try {
         const response = await api.put(`/event/${event.id}`, newEvent);
         const data = response.data;
         console.log(data);
-        showToast("Evento atualizado com sucesso.")
-
-
+        showToast("Evento atualizado com sucesso.");
+        setLoading(false)
       } catch (error) {
         console.log(error);
+        setLoading(false)
+
       }
     } else {
       try {
@@ -150,10 +149,13 @@ export default function EventForm({
         const data = response.data;
         console.log(data);
         console.log("CRIADO");
-        showToast("Evento criado com sucesso.")
+        showToast("Evento criado com sucesso.");
+        setLoading(false)
 
       } catch (error) {
         console.log(error);
+        setLoading(false)
+
       }
     }
     cleanFields();
@@ -164,6 +166,9 @@ export default function EventForm({
       const response = await api.delete(`/event/${event.id}`);
       const data = response.data;
       console.log("deletado: ", data);
+      showToast("Evento deletado com sucesso.");
+      fetchEvents(eventDate)
+
     } catch (error) {
       console.log(error);
     }
@@ -171,7 +176,6 @@ export default function EventForm({
 
   return (
     <View style={styles.block}>
-
       <View>
         <Text style={styles.label}>Atividade</Text>
         <View style={styles.inputBox}>
@@ -226,15 +230,21 @@ export default function EventForm({
       />
       <View>
         <Text style={styles.label}>Local</Text>
-        <TouchableOpacity style={styles.inputBox} onPress={()=>toggleModal()}>
+        <TouchableOpacity style={styles.inputBox} onPress={() => toggleModal()}>
           <Text
             style={styles.textInput}
             editable={false}
             placeholder="Clique no ícone"
             onChangeText={setLocal}
-          >{local.address}
+          >
+            {local.address}
           </Text>
-          <Entypo name="location-pin" size={20} style={styles.inputIcon} onPress={() => toggleModal()}/>
+          <Entypo
+            name="location-pin"
+            size={20}
+            style={styles.inputIcon}
+            onPress={() => toggleModal()}
+          />
         </TouchableOpacity>
       </View>
       <View>
@@ -262,18 +272,21 @@ export default function EventForm({
       </View>
       <View>
         <Text style={styles.label}>Privacidade</Text>
-        <RadioButton.Group onValueChange={newValue => setPrivacyId(newValue)} value={privacyId}>
+        <RadioButton.Group
+          onValueChange={(newValue) => setPrivacyId(newValue)}
+          value={privacyId}
+        >
           <View style={styles.radioContainer}>
             <View style={styles.radioButton}>
-              <RadioButton value={3} color="red"/>
+              <RadioButton value={3} color="red" />
               <Text>Público</Text>
             </View>
             <View style={styles.radioButton}>
-              <RadioButton value={1} color="red"/>
+              <RadioButton value={1} color="red" />
               <Text>Privado</Text>
             </View>
             <View style={styles.radioButton}>
-              <RadioButton value={2} color="red"/>
+              <RadioButton value={2} color="red" />
               <Text>Apenas amigos</Text>
             </View>
           </View>
@@ -282,20 +295,27 @@ export default function EventForm({
       <View style={{ flexDirection: "row", gap: 20 }}>
         <ButtonAction icon={"trash"} action={deleteEvent} />
         <ButtonAction icon={"plus"} action={addNewForm} />
-        <ButtonAction text={"Salvar"} action={handleEvent} />
+        
+        <ButtonAction text={"Salvar"} action={handleEvent} loading={loading} />
       </View>
       <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modalVisible}
-            statusBarTranslucent
-            onRequestClose={() => {
-              Alert.alert('Modal has been closed.');
-              setModalVisible(!modalVisible);
-            }}>
-              <PlaceEvent close={()=>toggleModal()} onSubmit={(val)=>{setLocal(val); console.log(local.address)}}/>
-
-          </Modal>
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        statusBarTranslucent
+        onRequestClose={() => {
+          Alert.alert("Modal has been closed.");
+          setModalVisible(!modalVisible);
+        }}
+      >
+        <PlaceEvent
+          close={() => toggleModal()}
+          onSubmit={(val) => {
+            setLocal(val);
+            console.log(local.address);
+          }}
+        />
+      </Modal>
     </View>
   );
 }
@@ -309,9 +329,8 @@ const styles = StyleSheet.create({
     flexDirection: "col",
     gap: 15,
     marginBottom: 20,
-    borderColor: '#c4c4c4ce',
+    borderColor: "#c4c4c4ce",
     borderWidth: 1,
-    
   },
   title: {
     fontFamily: "Montserrat-BoldItalic",
@@ -377,11 +396,11 @@ const styles = StyleSheet.create({
   radioButton: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 2
+    gap: 2,
   },
   radioContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginVertical: 8
+    marginVertical: 8,
   },
 });
