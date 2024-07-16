@@ -75,11 +75,22 @@ export default {
     }
   },
   async updateEvent(req, res) {
-    console.log("aquiiii");
+    console.log(" UPDATE");
     const { id } = req.params;
-    const { user_id, title, description, event_date, location_id, privacy_id } =
-      req.body;
+
     const event_id = parseInt(id);
+
+    const {
+      title,
+      description,
+      event_date,
+      user_id,
+      privacy_id,
+      category_id,
+      address,
+      latitude,
+      longitude
+    } = req.body;
 
     const event_exists = await prisma.event.findUnique({
       where: { id: event_id },
@@ -94,12 +105,32 @@ export default {
           id: event_id,
         },
         data: {
-          user_id,
           title,
           description,
           event_date,
-          location_id,
-          privacy_id,
+          user: {
+            connect: {
+              id: user_id,
+            },
+          },
+          privacy: {
+            connect: {
+              id: privacy_id,
+            },
+          },
+          eventCategory: {
+            connect: {
+              id: category_id,
+            },
+          },
+          location: {
+            create: {
+              address: address,
+              latitude: latitude,
+              longitude: longitude
+            },
+          }
+
         },
       });
       res.json(updated_event);

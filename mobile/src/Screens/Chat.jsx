@@ -80,6 +80,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     paddingHorizontal: 15,
     backgroundColor: "#fff",
+    zIndex: -1
   },
   search: {
     paddingVertical: 10,

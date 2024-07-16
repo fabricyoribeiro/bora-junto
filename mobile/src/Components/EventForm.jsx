@@ -20,11 +20,13 @@ import { RadioButton } from "react-native-paper";
 import ReactNativeModal from "react-native-modal";
 import PlaceEvent from "../Components/PlaceEvent"
 
+
 export default function EventForm({
   event,
   addNewForm,
   eventDate,
   fetchEvents,
+  showToast
 }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -50,6 +52,8 @@ export default function EventForm({
   const toggleModal = () => {
     setModalVisible(!modalVisible)
   }
+
+
 
   async function fetchCategories(date) {
     try {
@@ -106,16 +110,19 @@ export default function EventForm({
 
   async function handleEvent() {
     //pega a data do evento e junta com a hora que vem do input
+
+
+    // console.log("TESTE", event.event_date);
+    
     const dateObj = new Date(eventDate);
     const datePart = dateObj.toISOString().split("T")[0];
     const newEventDate = `${datePart}T${time}:00.000Z`;
     console.log("Novo Event Date:", newEventDate);
-
+    
     const newEvent = {
       user_id: userId,
       title: title,
       description: description,
-      //esse 2 é o id de um location cadastrado
       address: local.address,
       latitude: local.latitude,
       longitude: local.longitude,
@@ -124,12 +131,16 @@ export default function EventForm({
       privacy_id: privacyId,
     };
     //update nao funcionou
-    console.log(newEvent)
+    console.log("NOVO EVENTO",newEvent)
     if (event) {
+      console.log('UPDATE')
       try {
         const response = await api.put(`/event/${event.id}`, newEvent);
         const data = response.data;
         console.log(data);
+        showToast("Evento atualizado com sucesso.")
+
+
       } catch (error) {
         console.log(error);
       }
@@ -138,7 +149,9 @@ export default function EventForm({
         const response = await api.post(`/event/`, newEvent);
         const data = response.data;
         console.log(data);
-        console.log("ll");
+        console.log("CRIADO");
+        showToast("Evento criado com sucesso.")
+
       } catch (error) {
         console.log(error);
       }
@@ -158,6 +171,7 @@ export default function EventForm({
 
   return (
     <View style={styles.block}>
+
       <View>
         <Text style={styles.label}>Atividade</Text>
         <View style={styles.inputBox}>

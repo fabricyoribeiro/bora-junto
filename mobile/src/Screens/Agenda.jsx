@@ -20,6 +20,9 @@ import { getUserUID } from "../Services/AuthService";
 import Loading from "../Components/Loading.jsx";
 import ButtonAction from "../Components/ButtonAction.jsx";
 import PlaceEvent from "../Components/PlaceEvent.jsx"
+import Toast, {BaseToast, ErrorToast} from 'react-native-toast-message';
+import useToastConfig from "../Hooks/useToast";
+
 
 const { width } = Dimensions.get("window");
 
@@ -34,6 +37,8 @@ export default function Agenda({ onLogout }) {
   // user que ta logado
   const userId = getUserUID();
 
+   const {toastConfig,showToast} = useToastConfig()
+
   const addNewEventForm = () => {
     setNewEventForms([...newEventForms, { id: newEventForms.length + 1 }]);
   };
@@ -43,6 +48,7 @@ export default function Agenda({ onLogout }) {
       newEventForms.filter((newEventForm) => newEventForm.id !== id)
     );
   };
+
 
   const weeks = useMemo(() => {
     const start = moment().add(week, "weeks").startOf("week");
@@ -64,18 +70,6 @@ export default function Agenda({ onLogout }) {
     const formattedDate = currentDate.toISOString().slice(0, 10)
     fetchEvents(formattedDate);
   }, []);
-
-  // esse fetch pega por usuario
-  // async function fetchEvents() {
-  //   try {
-  //     const response = await api.get(`/event/user/${userId}`);
-  //     const data = response.data;
-  //     setEvents(data);
-  //     console.log(data);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
 
   // esse fetch pega por dia e usuario
   async function fetchEvents(date) {
@@ -192,7 +186,10 @@ export default function Agenda({ onLogout }) {
                 key={event.id}
                 event={event}
                 addNewForm={addNewEventForm}
+                fetchEvents={fetchEvents}
+                eventDate={value}
                 delete={() => deleteEvent(event.id)}
+                showToast={showToast}
               />
             ))}
           {Array.isArray(newEventForms) &&
@@ -202,12 +199,15 @@ export default function Agenda({ onLogout }) {
                 addNewForm={addNewEventForm}
                 eventDate={value}
                 fetchEvents={fetchEvents}
+                showToast={showToast}
+
               />
             ))}
 
         </ScrollView>
 
       </View>
+      <Toast config={toastConfig} />
     </SafeAreaView>
   );
 }
