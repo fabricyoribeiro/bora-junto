@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
         width: '100%',
         alignItems: 'center',
         gap: 10,
-        // zIndex: 1
+        zIndex: 1
 
     },
     menutoggle: {

@@ -5,7 +5,7 @@ import { api } from "../Lib/axios";
 import Header from "../Components/Header"
 import { Checkbox } from "react-native-paper";
 import MapView, { Marker } from 'react-native-maps';
-
+import MarkerIcons from '../Components/MarkerIcons'
 
 
 
@@ -155,6 +155,8 @@ export default function Map({ navigation, onLogout }) {
 
 
     }
+
+
 
     function showEventDetails(event) {
         setSelectedEvent(event)

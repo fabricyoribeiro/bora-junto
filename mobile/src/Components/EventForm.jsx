@@ -365,6 +365,7 @@ const styles = StyleSheet.create({
   textInput: {
     borderBottomWidth: 0.5,
     borderBottomColor: "gray",
+    color: 'black',
     minheight: 40,
     width: "100%",
     maxHeight: 180,
