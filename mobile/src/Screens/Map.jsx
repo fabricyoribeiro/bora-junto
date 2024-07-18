@@ -156,8 +156,6 @@ export default function Map({ navigation, onLogout }) {
 
     }
 
-
-
     function showEventDetails(event) {
         setSelectedEvent(event)
         setEventDetailsVisible(true)
@@ -210,7 +208,7 @@ export default function Map({ navigation, onLogout }) {
                                             placeholder="Search for a location"
                                             style={{ maxHeight: 50 }}
                                             onChangeText={(val) => { AutoCompleteFetch(val); setSearch(val) }}
-                                            onPress={() => {setFilterVisible(false); setEventDetailsVisible(false)}}
+                                            onPress={() => { setFilterVisible(false); setEventDetailsVisible(false) }}
                                         />
                                         <TouchableOpacity style={styles.sendIcon}>
                                             <FontAwesome name="search" size={20} color="black" />
@@ -281,7 +279,7 @@ export default function Map({ navigation, onLogout }) {
                             ref={mapRef}
                             style={styles.map}
                             customMapStyle={mapStyle}
-                            
+
                             initialRegion={{
                                 latitude: position.coords.latitude,
                                 longitude: position.coords.longitude,

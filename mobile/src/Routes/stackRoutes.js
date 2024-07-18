@@ -18,7 +18,6 @@ function StackRoutes() {
     <Stack.Navigator
       screenOptions={{ headerShown: false, animation: "fade_from_bottom" }}
     >
-
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Agenda" component={Agenda} />
       <Stack.Screen name="Feed" component={Feed} />

@@ -18,12 +18,14 @@ import { RadioButton } from "react-native-paper";
 import { now } from "lodash";
 import { format } from "date-fns";
 import pt from "date-fns/locale/pt";
+import { navigate } from "../../RootNavigation";
 
 export default function EventDetails({
     event,
     addNewForm,
     eventDate,
     fetchEvents,
+    navigation
 }) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
@@ -31,6 +33,8 @@ export default function EventDetails({
     const [time, setTime] = useState("");
     const [date, setDate] = useState(new Date());
     const [category, setCategory] = useState(null)
+    const [isParticipantAlreadExists, setIsParticipantAlreadyExists] = useState(false)
+    
 
 
     useEffect(() => {
@@ -51,11 +55,38 @@ export default function EventDetails({
                 minutes
             ).padStart(2, "0")}`;
             setTime(formattedTime);
+            checkParticipantAlreaydExists()
         }
     }, [event]);
 
+    async function checkParticipantAlreaydExists(){
+        try {
+            console.log('EVENT', event.id)
+            const {data} = await api.post('/participant/exists', {
+                event_id: event.id,
+                user_id: getUserUID()
+            })
+            setIsParticipantAlreadyExists(data.participant_already_exists);
+            console.log("existe",data.participant_already_exists)
+        } catch (error) {
+            console.log('Erro no check', error)
+        }
+    }
 
-
+    async function joinTheEvent(){
+        
+        try {
+            const {data} = await api.post('/participant/add', {
+                event_id: event.id,
+                user_id: getUserUID()
+            })
+            console.log("Participant do evento", data)
+            
+            navigate("Agenda")
+        } catch (error) {
+            console.log("Erro in the join event", error)
+        }
+    }
 
 
     return (
@@ -82,7 +113,18 @@ export default function EventDetails({
             </View>
 
             <View style={{ flexDirection: "row", gap: 20 }}>
-                <ButtonAction text={"Participar"}/>
+                {
+                    isParticipantAlreadExists? (
+                        <View style={styles.participantAlreadyExists}>
+                            <Text style={{textAlign: 'center', color: "#123a12", fontWeight: '600'}}>Você já está inscrito nesse evento</Text>
+                        </View>
+
+                    ) : (
+                        <ButtonAction text={"Participar"} action={joinTheEvent} />
+
+                    )
+                }
+
             </View>
         </View>
     );
@@ -97,9 +139,6 @@ const styles = StyleSheet.create({
         gap: 15,
         zIndex: 99,
         elevation: 30,
-
-
-
     },
     title: {
         fontFamily: "Montserrat-BoldItalic",
@@ -115,7 +154,16 @@ const styles = StyleSheet.create({
         fontFamily: "Montserrat-Italic",
         color: "gray",
         fontSize: 14
-    },
+    },participantAlreadyExists: {
+        backgroundColor: "#d1e7ca",
+        height: 50,
+        borderRadius: 76,
+        justifyContent: "center",
+        alignContent: "center",
+        alignSelf: "center",
+        flex: 1,
+        
+    }
 
 
 
