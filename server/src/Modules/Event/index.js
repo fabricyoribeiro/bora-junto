@@ -20,10 +20,6 @@ export default {
           title,
           description,
           event_date,
-          // user_id,
-          // location_id,
-          // privacy_id,
-          // category_id,
           user: {
             connect: {
               id: user_id,
@@ -74,6 +70,8 @@ export default {
       res.status(500).json({ erro: "Erro while deleting event", error });
     }
   },
+
+
   async updateEvent(req, res) {
     console.log(" UPDATE");
     const { id } = req.params;
@@ -192,6 +190,8 @@ export default {
       return res.json({ error });
     }
   },
+
+
   async findAllEventsByDate(req, res) {
     const { date } = req.params;
     const user_id  = req.query.user_id;
@@ -220,18 +220,45 @@ export default {
             gte: startOfDay,
             lte: endOfDay,
           },
+
         },
         include:{
           location:true
         }
       });
 
-      if (!events || events.length === 0) {
+      const participantEvents = await prisma.participant.findMany({
+        where: {
+          user_id,
+          event: {
+            event_date: {
+              gte: startOfDay,
+              lte: endOfDay,
+            },
+          },
+        },
+        include: {
+          event: {
+            include: {
+              location: true,
+            },
+          },
+        },
+      });
+  
+      // Combine both sets of events
+      const allEvents = [
+        ...events,
+        ...participantEvents.map(participant => participant.event),
+      ];
+
+      if (!allEvents || allEvents.length === 0) {
         return res.json({ error: "No events found for this date" });
       }
 
-      return res.json(events);
+      return res.json(allEvents);
     } catch (error) {
+      console.log('Error while processing events')
       return res.status(500).json({ error: "Internal server error" });
     }
   },
