@@ -34,7 +34,7 @@ export default function EventDetails({
     const [date, setDate] = useState(new Date());
     const [category, setCategory] = useState(null)
     const [isParticipantAlreadExists, setIsParticipantAlreadyExists] = useState(false)
-    
+
 
 
     useEffect(() => {
@@ -59,29 +59,29 @@ export default function EventDetails({
         }
     }, [event]);
 
-    async function checkParticipantAlreaydExists(){
+    async function checkParticipantAlreaydExists() {
         try {
             console.log('EVENT', event.id)
-            const {data} = await api.post('/participant/exists', {
+            const { data } = await api.post('/participant/exists', {
                 event_id: event.id,
                 user_id: getUserUID()
             })
             setIsParticipantAlreadyExists(data.participant_already_exists);
-            console.log("existe",data.participant_already_exists)
+            console.log("existe", data.participant_already_exists)
         } catch (error) {
             console.log('Erro no check', error)
         }
     }
 
-    async function joinTheEvent(){
-        
+    async function joinTheEvent() {
+
         try {
-            const {data} = await api.post('/participant/add', {
+            const { data } = await api.post('/participant/add', {
                 event_id: event.id,
                 user_id: getUserUID()
             })
             console.log("Participant do evento", data)
-            
+
             navigate("Agenda")
         } catch (error) {
             console.log("Erro in the join event", error)
@@ -91,32 +91,42 @@ export default function EventDetails({
 
     return (
         <View style={styles.block}>
-            <Text style={styles.title}>{title}</Text>
+
+            <View style={{ flexDirection: 'row', justifyContent: "space-between" }}>
+                <Text style={styles.title}>{title}</Text>
+                <View style={styles.userContainer}>
+                    <Text style={styles.subtitle}>{event.user.name}</Text>
+                    <View style={styles.userIcon} />
+                </View>
+            </View>
+
             <Text style={styles.subtitle} lineBreakMode="tail">{description}</Text>
             {
                 category !== 'Não definido' &&
                 <Text style={styles.subtitle}>{category}</Text>
             }
 
+
+
             <View style={{ flexDirection: 'row', gap: 30 }}>
                 {
                     date &&
                     <View style={{ flexDirection: 'row', gap: 5 }}>
-                        <FontAwesome6 name="calendar" size={18} color={'gray'}/>
+                        <FontAwesome6 name="calendar" size={18} color={'gray'} />
                         <Text style={styles.label}>{format(new Date(date), "P", { locale: pt })}</Text>
                     </View>
                 }
                 <View style={{ flexDirection: 'row', gap: 5 }}>
-                    <FontAwesome6 name="clock" size={18} color={'gray'}/>
+                    <FontAwesome6 name="clock" size={18} color={'gray'} />
                     <Text style={styles.label}>{time}</Text>
                 </View>
             </View>
 
             <View style={{ flexDirection: "row", gap: 20 }}>
                 {
-                    isParticipantAlreadExists? (
+                    isParticipantAlreadExists ? (
                         <View style={styles.participantAlreadyExists}>
-                            <Text style={{textAlign: 'center', color: "#123a12", fontWeight: '600'}}>Você já está inscrito nesse evento</Text>
+                            <Text style={{ textAlign: 'center', color: "#123a12", fontWeight: '600' }}>Você já está inscrito nesse evento</Text>
                         </View>
 
                     ) : (
@@ -154,7 +164,7 @@ const styles = StyleSheet.create({
         fontFamily: "Montserrat-Italic",
         color: "gray",
         fontSize: 14
-    },participantAlreadyExists: {
+    }, participantAlreadyExists: {
         backgroundColor: "#d1e7ca",
         height: 50,
         borderRadius: 76,
@@ -162,9 +172,19 @@ const styles = StyleSheet.create({
         alignContent: "center",
         alignSelf: "center",
         flex: 1,
-        
-    }
 
+    },
+    userIcon: {
+        width: 40,
+        height: 40,
+        borderRadius: 40,
+        backgroundColor: "#eaeaea",
+    },
+    userContainer: { 
+        flexDirection: 'row', 
+        alignItems: 'center', 
+        gap: 8 
+    }
 
 
 });

@@ -46,6 +46,7 @@ export default {
         const receiver_id = req.query.receiver_id;
 
         console.log('receiver:',receiver_id)
+        console.log('sender:',id)
 
         try {
             const messages = await prisma.message.findMany({
@@ -65,6 +66,7 @@ export default {
                     created_at: 'desc' // or 'desc' for descending order
                 }
             });
+            console.log(messages)
             return res.json(messages);
 
         } catch (error) {

@@ -76,6 +76,8 @@ model User {
   sentMessages     Message[]     @relation("SentMessages")
   receiveMessages  Message[]     @relation("ReceivedMessages")
   Participant      Participant[]
+  contact          User[]        @relation("UserContacts")
+  User             User[]        @relation("UserContacts")
 
   @@map("user")
 }

@@ -13,7 +13,7 @@ export default {
       latitude,
       longitude
     } = req.body;
-    console.log("TESTE", privacy_id, category_id)
+    console.log("TESTE",user_id)
     try {
       const event = await prisma.event.create({
         data: {
@@ -182,7 +182,18 @@ export default {
     //erro de segurança, futuramente esse método vai ser alterado, por enquanto é só pra ir testando o mapa
     try {
       const event = await prisma.event.findMany({
-        include: { location: true, privacy: true, eventCategory: true},
+        include: { 
+          location: true, 
+          privacy: true, 
+          eventCategory: true, 
+          user: {
+            select: {
+              name: true,
+              profile_pic_url: true,
+            }
+          }
+        },
+
       }); //apenas simulação, no futuro vai ser pego somente public e friends-only
       if (!event) return res.json({ error: "Event does not exist" });
       return res.json(event);

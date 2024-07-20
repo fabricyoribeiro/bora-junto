@@ -10,7 +10,7 @@ export default function Contact({ name, imageUrl, lastMessage, online, email, id
         <Text style={styles.title}>
           {name} {online ? (<FontAwesome name="circle" color="#5f6" />) : (<></>)}
         </Text>
-        <Text style={styles.subtitle}>{lastMessage}</Text>
+        <Text style={styles.subtitle}>{lastMessage || ''}</Text>
       </View>
     </TouchableOpacity>
   );

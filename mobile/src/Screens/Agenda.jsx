@@ -10,21 +10,22 @@ import {
   Modal,
   StatusBar,
 } from "react-native";
-import moment from "moment";
 import Swiper from "react-native-swiper";
-import { format } from "date-fns";
-import pt from "date-fns/locale/pt";
-import { api } from "../Lib/axios";
 import EventForm from "../Components/EventForm";
 import Header from "../Components/Header";
-import { getUserUID } from "../Services/AuthService";
 import Loading from "../Components/Loading.jsx";
 import ButtonAction from "../Components/ButtonAction.jsx";
 import PlaceEvent from "../Components/PlaceEvent.jsx";
 import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
-import useToastConfig from "../Hooks/useToast";
 
+import moment from "moment";
+import { format } from "date-fns";
+import pt from "date-fns/locale/pt";
+import { api } from "../Lib/axios";
+import { getUserUID } from "../Services/AuthService";
+import useToastConfig from "../Hooks/useToast";
 const { width } = Dimensions.get("window");
+
 
 export default function Agenda({ onLogout }) {
   const swiper = useRef();

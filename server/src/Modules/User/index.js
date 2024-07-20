@@ -46,12 +46,94 @@ export default {
     }
   },
 
+  async getContactListByUserId(req, res) {
+    const {user_id} = req.params;
+    console.log("ID", user_id)
+    try {
+      const user = await prisma.user.findUnique({
+        where: {
+          id: user_id,
+        },
+        include: {
+          contact: true,
+           
+        },
+      });
+  
+      if (!user) {
+        
+        console.error("user not found");
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      res.json(user.contact);
+    } catch (error) {
+      console.error("Error while getting contacts:", error);
+      res.status(500).json({ error: "Error while getting contacts" });
+    }
+  },
+  
+  async setContactToUser(req, res){
+    const { user_id } = req.params;
+    const { contact_id } = req.body;
+
+    console.log("UPDATE", contact_id, user_id)
+  
+    try {
+      // Verificar se o usuário e o contato existem
+      const user = await prisma.user.findUnique({ where: { id: user_id } });
+      const contact = await prisma.user.findUnique({ where: { id: contact_id } });
+  
+      if (!user || !contact) {
+        return res.status(404).json({ error: "User or contact not found" });
+      }
+  
+      // Adicionar o contato à lista de contatos do usuário
+      const updatedUser = await prisma.user.update({
+        where: { id: user_id },
+        data: {
+          contact: {
+            connect: { id: contact_id },
+          },
+        },
+        include: {
+          contact: true,  // Inclui a lista atualizada de contatos na resposta
+        },
+      });
+  
+      res.json(updatedUser.contacts);
+    } catch (error) {
+      console.error("Error while adding contact:", error);
+      res.status(500).json({ error: "Error while adding contact" });
+    }
+
+  },
+
   async findAllUsers(req, res) {
     try {
       const users = await prisma.user.findMany();
       return res.json(users);
     } catch (error) {
       return res.json({ error });
+    }
+  },
+
+  async filterAllUsers(req, res){
+    const {query} = req.query
+    console.log("QUERY", query)
+    try {
+      const users = await prisma.user.findMany({
+        where: {
+          username: {
+            contains: query,
+            mode: "insensitive",
+          }
+        }
+      })
+      console.log("USER FILTERED", users)
+      return res.json(users);
+    } catch (error) {
+      return res.status(500).json({ error: error})
     }
   },
 
@@ -65,29 +147,6 @@ export default {
       return res.json({ error });
     }
   },
-//   async fidUserIdByEmail(req, res) {
-//     const email  = req.query.email
-//     console.log("email server", email);
-//     try {
-//       const userId = await prisma.user.findUnique({
-//         where: {
-//           email,
-//         },select: {
-//             id:true
-//         }
-//       });
-//       if (!user) {
-//         return res.status(404).json({ error: "User not found" });
-//       }
-  
-
-//       console.log("id server", userId);
-//       return res.json(userId);
-//     } catch (error) {
-//       console.error("Erro while getting user id", error);
-//       res.status(500).json({ error: "Erro while getting user id" });
-//     }
-//   },
 
   async findUserByUserName(req, res) {
     try {

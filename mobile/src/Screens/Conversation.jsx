@@ -27,6 +27,10 @@ export default function Conversation({ route }) {
   const userId = getUserUID();
   const { socketInstance, isConnected } = useSocket();
 
+
+
+
+
   useEffect(() => {
     if (socketInstance) {
       socketInstance.emit("join_room", userId);
@@ -68,6 +72,7 @@ export default function Conversation({ route }) {
       console.log("nova mensagem criada", newMessage);
       socketInstance.emit("message", newMessage);
       setMessage("");
+      addContact()
     } catch (error) {
       console.log(error);
     }
@@ -91,8 +96,10 @@ export default function Conversation({ route }) {
           receiver_id: receiverId,
         },
       });
-      setDbMessages(response.data);
+      console.log("MENSAGENS",response.data);
       console.log(response.data);
+
+      setDbMessages(response.data);
 
     } catch (error) {
       console.log(error);
@@ -131,6 +138,20 @@ export default function Conversation({ route }) {
         />
       </View>
     );
+  }
+
+  //teste para adicionar contato ao user
+  async function addContact(){
+    try {
+      const user_id = getUserUID()
+      const contact_id = receiverId
+      const {data} = await api.put(`/user/contact/${user_id}`, {
+        contact_id: contact_id
+      })
+      console.log("DATA",data)
+    } catch (error) {
+      console.log("ERROR", error)
+    }
   }
 
   return (
