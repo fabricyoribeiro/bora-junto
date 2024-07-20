@@ -4,6 +4,7 @@ import * as Notifications from "expo-notifications";
 import Routes from "./src/Routes/index.js";
 import { NavigationContainer } from "@react-navigation/native";
 import { navigationRef } from "./RootNavigation.js";
+import { UserProvider } from "./src/Context/userContext.js";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -20,9 +21,11 @@ export default function App() {
   });
   if (fontsLoaded) {
     return (
-      <NavigationContainer ref={navigationRef}>
-        <Routes />
-      </NavigationContainer>
+      <UserProvider>
+        <NavigationContainer ref={navigationRef}>
+          <Routes />
+        </NavigationContainer>
+      </UserProvider>
     );
   }
 }
