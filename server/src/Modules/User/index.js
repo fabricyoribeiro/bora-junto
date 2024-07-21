@@ -140,7 +140,7 @@ export default {
   async findUserById(req, res) {
     try {
       const { id } = req.params;
-      const user = await prisma.user.findUnique({ where: { id } });
+      const user = await prisma.user.findUnique({ where: { id }, include: {user_category: true}});
       if (!user) return res.json({ error: "User does not exist" });
       return res.json(user);
     } catch (error) {

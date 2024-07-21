@@ -15,6 +15,7 @@ import {
 import Chat from "../Screens/Chat.jsx";
 import Conversation from "../Screens/Conversation.jsx";
 import Map from "../Screens/Map.jsx";
+import UserProfile from "../Screens/UserProfile.jsx";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -66,6 +67,9 @@ function HomeStack({ onLogout }) {
       </Stack.Screen>
       <Stack.Screen name="Map" options={{ headerShown: false }}>
         {(props) => <Map {...props} onLogout={onLogout} />}
+      </Stack.Screen>
+      <Stack.Screen name="UserProfile" options={{ headerShown: false }}>
+        {(props) => <UserProfile {...props} onLogout={onLogout} />}
       </Stack.Screen>
     </Stack.Navigator>
   );

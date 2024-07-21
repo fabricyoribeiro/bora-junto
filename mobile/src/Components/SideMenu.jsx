@@ -55,9 +55,11 @@ export default function SideMenu({ closeMenu, onLogout }) {
           <FontAwesome name="user-plus" size={17} />
           <Text style={styles.subtitle}>Solicitações</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
-          <FontAwesome name="gear" size={17} />
-          <Text style={styles.subtitle}>Configurações</Text>
+        <TouchableOpacity
+        onPress={() => RootNavigation.navigate("UserProfile", {screen:'UserProfile'})}
+        style={styles.menuItem}>
+          <FontAwesome name="gear" size={17}/>
+          <Text style={styles.subtitle}>Perfil</Text>
         </TouchableOpacity>
 
         <TouchableOpacity

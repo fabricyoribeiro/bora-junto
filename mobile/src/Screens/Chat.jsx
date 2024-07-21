@@ -9,6 +9,7 @@ import { api } from "../Lib/axios";
 import { getUserUID } from "../Services/AuthService";
 import { UserContext } from "../Context/userContext";
 import _ from 'lodash';
+import { StatusBar } from "expo-status-bar";
 
 export default function Chat({ onLogout }) {
   const [contacts, setContacts] = useState([]);
@@ -86,6 +87,7 @@ export default function Chat({ onLogout }) {
 
   return (
     <SafeAreaView>
+      <StatusBar translucent={true} backgroundColor="white"/>
       <Header title="Chat" onLogout={onLogout} />
       <View style={styles.container}>
         <View style={styles.searchContainer}>

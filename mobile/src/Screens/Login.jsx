@@ -13,12 +13,15 @@ import {
 import CheckBox from "expo-checkbox";
 import { Ionicons } from "@expo/vector-icons";
 import {
-  signInWithEmailAndPassword, createUserWithEmailAndPassword
+  signInWithEmailAndPassword, createUserWithEmailAndPassword,
+
 
 } from "firebase/auth";
 import { auth } from './../Services/FireBaseConfig.js'
 import { api } from "../Lib/axios.js";
-
+import Toast, { BaseToast, ErrorToast } from "react-native-toast-message";
+import useToastConfig from "../Hooks/useToast";
+import { Checkbox } from "react-native-paper";
 
 export default function Login({ navigation, onLogin }) {
   const [email, setEmail] = useState("");
@@ -28,17 +31,19 @@ export default function Login({ navigation, onLogin }) {
   const [username, setUsername] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loginVisible, setLoginVisible] = useState(true);
+  const [persistence, setPersistence] = useState(false)
+  const { toastConfig, showToast } = useToastConfig();
 
   const createUser = async (userData) => {
     try {
       const response = await api.post('/user', userData)
-      if(response.status === 200){
+      if (response.status === 200) {
         console.log("USUARIO CRIADO COM SUCESSO")
         onLogin()
       }
-      
+
     } catch (error) {
-      console.log("Erro no create user", error)  
+      console.log("Erro no create user", error)
     }
   }
 
@@ -69,18 +74,23 @@ export default function Login({ navigation, onLogin }) {
       });
   }
   const handleLogin = () => {
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        // Signed in 
-        const user = userCredential.user;
-        console.log(user)
-        onLogin()
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorMessage)
-      });
+    if (email.trim() === '' || password.trim() === '') {
+      showToast('Preencha todos os campos', 'error')
+    } else {
+      signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Signed in 
+          const user = userCredential.user;
+          console.log(user)
+          onLogin()
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.log(errorMessage)
+          showToast('Email/senha inválidos', 'error')
+        });
+    }
 
 
   };
@@ -139,7 +149,17 @@ export default function Login({ navigation, onLogin }) {
             <View
               style={{ flexDirection: "row", gap: 10, alignItems: "center" }}
             >
-              <CheckBox />
+              <Checkbox.Item
+                color="red"
+                
+                labelStyle={styles.subtitle && { fontSize: 13 }}
+                style={{ color: 'black', paddingVertical: 0, paddingHorizontal: 0,height: 30 }}
+                status={persistence ? 'checked' : 'unchecked'}
+                onPress={() => {
+                  setPersistence(!persistence)
+                }}
+              >
+              </Checkbox.Item>
               <Text style={styles.label}>Manter conectado</Text>
             </View>
             <View
@@ -255,6 +275,7 @@ export default function Login({ navigation, onLogin }) {
 
         </>
       )}
+      <Toast config={toastConfig} />
     </View>
   );
 }
