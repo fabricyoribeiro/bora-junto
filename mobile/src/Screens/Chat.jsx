@@ -126,7 +126,7 @@ export default function Chat({ onLogout }) {
               keyExtractor={(item) => item.username}
               showsVerticalScrollIndicator={false}
               renderItem={({ item }) => (
-                <Contact name={item.name} online={item.online} email={item.email} id={item.id} />
+                <Contact user = {item}/>
               )}
             />
           )

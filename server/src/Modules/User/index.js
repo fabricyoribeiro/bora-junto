@@ -56,6 +56,7 @@ export default {
         },
         include: {
           contact: true,
+          user_category:true
            
         },
       });
@@ -97,8 +98,8 @@ export default {
           },
         },
         include: {
-          contact: true,  // Inclui a lista atualizada de contatos na resposta
-        },
+          contact: true,// Inclui a lista atualizada de contatos na resposta
+          user_category:true          },
       });
   
       res.json(updatedUser.contacts);
@@ -128,6 +129,10 @@ export default {
             contains: query,
             mode: "insensitive",
           }
+          
+        },
+        include: {
+          user_category:true
         }
       })
       console.log("USER FILTERED", users)
