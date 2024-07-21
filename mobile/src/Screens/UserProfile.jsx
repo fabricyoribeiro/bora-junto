@@ -64,7 +64,7 @@ export default function UserProfile({ navigation, onLogout }) {
                 <View style={{ flexDirection: 'row', width: '100%', gap: 15, alignItems: 'center' }}>
                     <View style={styles.profilePic}>
                         { profilePic && 
-                            <Image source={{uri:profilePic}} width={100} height={100}/>
+                            <Image source={{uri:profilePic}} width={70} height={70}/>
                         }
                     </View>
                     <View style={{ flexDirection: 'column' }}>
@@ -187,8 +187,8 @@ const styles = StyleSheet.create({
 
     },
     profilePic: {
-        width: 100,
-        height: 100,
+        width: 70,
+        height: 70,
         backgroundColor: '#EAEAEA',
         borderRadius: 100,
         alignItems:'center',
