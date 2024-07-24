@@ -7,7 +7,7 @@ export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Adicionar estado de carregamento
+  const [loading, setLoading] = useState(true);
 
   const userId = getUserUID();
 
@@ -18,7 +18,6 @@ export const UserProvider = ({ children }) => {
     }
 
     try {
-      // Primeiro tenta carregar o usuário do Async Storage
       const storedUser = await AsyncStorage.getItem(`user_${userId}`);
       if (storedUser) {
         setUser(JSON.parse(storedUser));
@@ -26,12 +25,9 @@ export const UserProvider = ({ children }) => {
         return;
       }
 
-      // Se não houver usuário no Async Storage, busca da API
       const response = await api.get(`/user/${userId}`);
-      console.log("USER", response.data);
       setUser(response.data);
-      
-      // Salva o usuário no Async Storage
+
       await AsyncStorage.setItem(`user_${userId}`, JSON.stringify(response.data));
     } catch (error) {
       console.log("ERROR", error);
@@ -42,14 +38,24 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     getUser();
-  }, [userId]); // Adicionar userId como dependência para recarregar quando userId mudar
+  }, [userId]);
+
+  const updateUser = async (newUser) => {
+    setUser(newUser);
+
+    try {
+      await AsyncStorage.setItem(`user_${userId}`, JSON.stringify(newUser));
+    } catch (error) {
+      console.log("Error updating user in AsyncStorage:", error);
+    }
+  };
 
   if (loading) {
     return null; // Ou algum tipo de indicador de carregamento
   }
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ user, setUser: updateUser }}>
       {children}
     </UserContext.Provider>
   );

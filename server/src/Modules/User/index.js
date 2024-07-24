@@ -179,27 +179,25 @@ export default {
       const { id } = req.params;
 
       const {
+        name,
         username,
         user_category,
-        profile_pic_url,
         phone,
         email,
         birth_date,
       } = req.body;
 
-      let user = await prisma.user.findUnique({ where: { id: Number(id) } });
+      let user = await prisma.user.findUnique({ where: { id } });
       if (!user) return res.status(404).json({ error: "User does not exist" });
 
       user = await prisma.user.update({
-        where: { id: Number(id) },
+        where: { id },
         data: {
+          name,
           username,
           email,
           phone,
-          user_category,
-          profile_pic_url,
           birth_date,
-          updated_at: Date.now(),
         },
       });
       return res.json(user);
