@@ -190,6 +190,11 @@ export default {
             select: {
               name: true,
               profile_pic_url: true,
+              _count: {
+                select: {
+                  Participant: true
+                }
+              }
             }
           }
         },

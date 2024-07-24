@@ -5,6 +5,7 @@ import {
     Text,
     TextInput,
     TouchableOpacity,
+    Image,
 } from "react-native";
 import ButtonAction from "../Components/ButtonAction";
 import { Entypo, FontAwesome, FontAwesome6 } from "@expo/vector-icons";
@@ -96,11 +97,14 @@ export default function EventDetails({
                 <Text style={styles.title}>{title}</Text>
                 <View style={styles.userContainer}>
                     <Text style={styles.subtitle}>{event.user.name}</Text>
-                    <View style={styles.userIcon} />
+                    <Image source={{uri: event.user.profile_pic_url}} style={styles.userIcon} />
                 </View>
             </View>
 
-            <Text style={styles.subtitle} lineBreakMode="tail">{description}</Text>
+            <View style={{ flexDirection: 'row', justifyContent: "space-between" }}>
+                <Text style={styles.subtitle} lineBreakMode="tail">{description}</Text>
+                <Text style={styles.label} lineBreakMode="tail">{event.user._count.Participant} Participantes</Text>
+            </View>
             {
                 category !== 'Não definido' &&
                 <Text style={styles.subtitle}>{category}</Text>
