@@ -1,5 +1,5 @@
 // import { StatusBar } from "expo-status-bar";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useContext } from "react";
 import { Text, View, StyleSheet, Image, StatusBar, ScrollView, TouchableOpacity, TouchableWithoutFeedback, Modal } from "react-native";
 import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import Header from "../Components/Header"
@@ -10,63 +10,29 @@ import pt from "date-fns/locale/pt";
 import Loading from "../Components/Loading.jsx";
 import ViewProfilePic from "../Components/ViewProfilePic.jsx";
 import { FontAwesome } from "@expo/vector-icons";
+import { UserContext } from "../Context/userContext.js";
 export default function UserProfile({ route, navigation, onLogout }) {
+
     const { user } = route.params;
-    const [name, setName] = useState(null)
-    const [username, setUsername] = useState(null)
-    const [category, setCategory] = useState(null)
-    const [profilePic, setProfilePic] = useState(null)
-    const [email, setEmail] = useState(null)
-    const [phone, setPhone] = useState(null)
-    const [description, setDescription] = useState('')
-    const [birthdate, setBirthdate] = useState(null)
-    const userId = getUserUID();
-    const [loading, setLoading] = useState(false)
+    const loggedUserId = getUserUID()
     const [modalVisible, setModalVisible] = useState(false);
     const toggleModal = () => {
         setModalVisible(!modalVisible);
-    };
-    async function fechtData(id) {
-        try {
-            setLoading(true)
-            if (user != null) {
-                setUsername(user.username)
-                setDescription(user.description)
-                setProfilePic(user.profile_pic_url)
-                setEmail(user.email)
-                setPhone(user.phone)
-                setName(user.name)
-                setBirthdate(user.birth_date)
-                // setCategory(user.user_category.description)
-                setLoading(false)
-            } else {
-                const response = await api.get(`/user/${id}`)
-                const data = response.data
-                setUsername(data.username)
-                setDescription(data.description)
-                setProfilePic(data.profile_pic_url)
-                setEmail(data.email)
-                setPhone(data.phone)
-                setName(data.name)
-                setBirthdate(data.birth_date)
-                // setCategory(data.user_category.description)
-                setLoading(false)
-            }
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    useEffect(() => {
-
-        // setUserId(userId)
-        console.log('IDDDD', userId)
-
-        fechtData(userId)
-
-    }, []);
-
-
+    };  
+    
+    // const [loading, setLoading] = useState(false)
+    // function fechtData(id) {
+    //     setLoading(true)
+    //     if (user != null) {
+    //         // const { user } = useContext(UserContext)
+    //         console.log(user.id)
+    //         setLoading(false)
+    //     }
+    // }
+    // useEffect(() => {
+    //     fechtData()
+    // }, []);
+    
     return (
         <View style={styles.bg}>
             <StatusBar
@@ -74,7 +40,7 @@ export default function UserProfile({ route, navigation, onLogout }) {
                 backgroundColor="transparent"
                 translucent
             />
-            <Loading visible={loading} />
+            {/* <Loading visible={loading} /> */}
             <Header title={`Perfil`} onLogout={onLogout} />
 
             <View style={styles.container}>
@@ -88,22 +54,22 @@ export default function UserProfile({ route, navigation, onLogout }) {
                         setModalVisible(!modalVisible);
                     }}
                 >
-                    <ViewProfilePic profilePic={profilePic} close={() => toggleModal()} />
+                    <ViewProfilePic profilePic={user.profile_pic_url} close={() => toggleModal()} />
                 </Modal>
                 <View style={{ flexDirection: 'row', gap: 15, alignItems: 'center', alignSelf: 'center', marginVertical: 30 }}>
                     <TouchableWithoutFeedback onPress={() => toggleModal()}>
-                        <Image source={{ uri: profilePic }} width={70} height={70} style={styles.image} />
+                        <Image source={{ uri: user.profile_pic_url }} width={70} height={70} style={styles.image} />
                     </TouchableWithoutFeedback>
                     <View style={{ flexDirection: 'column' }}>
 
-                        <Text style={styles.title}>{name}</Text>
-                        <Text style={styles.subtitle}>@{username}</Text>
+                        <Text style={styles.title}>{user.name}</Text>
+                        <Text style={styles.subtitle}>@{user.username}</Text>
                     </View>
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 10 }}>
                     <Text style={styles.subtitle}>Perfil</Text>
                     {
-                        !user &&
+                        user.id === loggedUserId &&
                         <Feather name="edit" size={20} color="black" />
                     }
                 </View>
@@ -113,7 +79,7 @@ export default function UserProfile({ route, navigation, onLogout }) {
                             <Feather name='user' size={20} color={'black'} />
                             <Text>Nome</Text>
                         </View>
-                        <Text>{name}</Text>
+                        <Text>{user.name}</Text>
                     </View>
                     <View style={styles.divisor} />
                     <View style={styles.info}>
@@ -121,7 +87,7 @@ export default function UserProfile({ route, navigation, onLogout }) {
                             <MaterialIcons name='alternate-email' size={20} color={'black'} />
                             <Text>Usuário</Text>
                         </View>
-                        <Text>@{username}</Text>
+                        <Text>@{user.username}</Text>
                     </View>
                     <View style={styles.divisor} />
                     <View style={styles.info}>
@@ -129,7 +95,7 @@ export default function UserProfile({ route, navigation, onLogout }) {
                             <Ionicons name='people-outline' size={20} color={'black'} />
                             <Text>Categoria</Text>
                         </View>
-                        <Text>{category ? category : 'Não definida'}</Text>
+                        <Text>{user.category ? user.category : 'Não definida'}</Text>
                     </View>
                     <View style={styles.divisor} />
                     <View style={styles.info}>
@@ -137,41 +103,41 @@ export default function UserProfile({ route, navigation, onLogout }) {
                             <Feather name='calendar' size={20} color={'black'} />
                             <Text>Data de nascimento</Text>
                         </View>
-                        <Text>{format(new Date(birthdate), "P", { locale: pt })}</Text>
+                        <Text>{format(new Date(user.birth_date), "P", { locale: pt })}</Text>
                     </View>
                 </View >
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 10 }}>
                     <Text style={styles.subtitle}>Sobre mim</Text>
                     {
-                        !user &&
+                        user.id === loggedUserId &&
                         <Feather name="edit" size={20} color="black" />
                     }
                 </View>
                 <View style={styles.block} >
-                    <Text style={{ maxHeight: 100 }} lineBreakMode="tail">{description ? description : 'Nada por enquanto...'}</Text>
+                    <Text style={{ maxHeight: 100 }} lineBreakMode="tail">{user.description ? user.description : 'Nada por enquanto...'}</Text>
                 </View >
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 10 }}>
                     <Text style={styles.subtitle}>Contato</Text>
                     {
-                        !user &&
+                        user.id === loggedUserId &&
                         <Feather name="edit" size={20} color="black" />
                     }
                 </View>
                 <View style={styles.block} >
                     <View style={styles.info}>
-                    <View style={styles.label}>
-                    <Feather name='phone' size={20} color={'black'} />
-                        <Text>Telefone</Text>
+                        <View style={styles.label}>
+                            <Feather name='phone' size={20} color={'black'} />
+                            <Text>Telefone</Text>
                         </View>
-                        <Text>{phone}</Text>
+                        <Text>{user.phone}</Text>
                     </View>
                     <View style={styles.divisor} />
                     <View style={styles.info}>
-                    <View style={styles.label}>
-                    <Feather name='mail' size={20} color={'black'} />
-                        <Text>Email</Text>
+                        <View style={styles.label}>
+                            <Feather name='mail' size={20} color={'black'} />
+                            <Text>Email</Text>
                         </View>
-                        <Text>{email}</Text>
+                        <Text>{user.email}</Text>
                     </View>
                 </View >
 
@@ -265,7 +231,7 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         backgroundColor: "#eaeaea",
     },
-    label:{
+    label: {
         flexDirection: "row",
         gap: 10
     }

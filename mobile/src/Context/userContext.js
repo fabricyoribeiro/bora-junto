@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { getUserUID } from '../Services/AuthService';
 import { api } from '../Lib/axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const UserContext = createContext();
 
@@ -17,9 +18,21 @@ export const UserProvider = ({ children }) => {
     }
 
     try {
+      // Primeiro tenta carregar o usuário do Async Storage
+      const storedUser = await AsyncStorage.getItem(`user_${userId}`);
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+        setLoading(false);
+        return;
+      }
+
+      // Se não houver usuário no Async Storage, busca da API
       const response = await api.get(`/user/${userId}`);
       console.log("USER", response.data);
       setUser(response.data);
+      
+      // Salva o usuário no Async Storage
+      await AsyncStorage.setItem(`user_${userId}`, JSON.stringify(response.data));
     } catch (error) {
       console.log("ERROR", error);
     } finally {

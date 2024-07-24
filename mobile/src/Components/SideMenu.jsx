@@ -2,6 +2,8 @@ import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import { FontAwesome, FontAwesome6} from "@expo/vector-icons";
 import * as RootNavigation from "../../RootNavigation";
 import { signOut, getAuth } from "firebase/auth";
+import { useContext } from "react";
+import { UserContext } from "../Context/userContext";
 
 export default function SideMenu({ closeMenu, onLogout }) {
 
@@ -16,6 +18,8 @@ export default function SideMenu({ closeMenu, onLogout }) {
       console.log("error signed out",error)
     })
   }
+
+  const {user} = useContext(UserContext)
 
 
   return (
@@ -56,7 +60,7 @@ export default function SideMenu({ closeMenu, onLogout }) {
           <Text style={styles.subtitle}>Solicitações</Text>
         </TouchableOpacity>
         <TouchableOpacity
-        onPress={() => RootNavigation.navigate("UserProfile", {screen:'UserProfile'})}
+        onPress={() => RootNavigation.navigate("UserProfile", {screen:'UserProfile', user})}
         style={styles.menuItem}>
           <FontAwesome name="gear" size={17}/>
           <Text style={styles.subtitle}>Perfil</Text>

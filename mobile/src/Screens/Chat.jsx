@@ -18,6 +18,8 @@ export default function Chat({ onLogout }) {
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const debounceTimeout = useRef(null);
 
+  // const { user } = useContext(UserContext);
+
   const navigation = useNavigation();
 
   useLayoutEffect(() => {
@@ -79,11 +81,10 @@ export default function Chat({ onLogout }) {
     }, 300); // Ajuste o tempo do debounce conforme necessário
   };
 
-  const { user } = useContext(UserContext);
 
-  const teste = () => {
-    console.log("TESTE CONTEXT", user);
-  };
+  // const teste = () => {
+  //   console.log("TESTE CONTEXT", user);
+  // };
 
   return (
     <SafeAreaView>
